@@ -1,4 +1,4 @@
-//package com.example.foodcourtmicroservice.configuration.security;
-//
-//public class MainSecurity {
-//}
+package com.example.foodcourtmicroservice.configuration.security;
+
+public class MainSecurity {
+}

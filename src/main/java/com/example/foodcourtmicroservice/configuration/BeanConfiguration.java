@@ -10,7 +10,6 @@ import com.example.foodcourtmicroservice.domain.api.IRestaurantExternalServicePo
 import com.example.foodcourtmicroservice.domain.api.IRestaurantServicePort;
 import com.example.foodcourtmicroservice.domain.spi.IRestaurantPersistencePort;
 import com.example.foodcourtmicroservice.domain.spi.IUserFeignClientPort;
-import com.example.foodcourtmicroservice.domain.usecase.RestaurantUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +27,8 @@ public class BeanConfiguration {
     public IRestaurantPersistencePort restaurantPersistencePort(){
         return new RestaurantMysqlAdapter(restaurantRepository, restaurantEntityMapper,restaurantExternalServicePort);
     }
-    @Bean
-    public IRestaurantServicePort restaurantServicePort(){ return new RestaurantUseCase(restaurantPersistencePort(), userFeignClient);}
+//    @Bean
+//    public IRestaurantServicePort restaurantServicePort(){ return new RestaurantUseCase(restaurantPersistencePort(), userFeignClient);}
 
     @Bean
     public IRestaurantExternalServicePort restaurantExternalServicePort(RestaurantFeignClient restaurantFeignClient,
@@ -37,4 +36,5 @@ public class BeanConfiguration {
                                                                         IRestaurantRequestMapper restaurantRequestMapper){
         return new FeignClientRestaurantAdapter(restaurantFeignClient, restaurantPersistencePort, restaurantRequestMapper);
     }
+
 }
