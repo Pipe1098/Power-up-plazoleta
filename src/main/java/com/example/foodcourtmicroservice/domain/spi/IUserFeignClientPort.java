@@ -5,9 +5,9 @@ import com.example.foodcourtmicroservice.domain.model.UserModel;
 public interface IUserFeignClientPort {
 
 
-    Boolean existsUserById(Long usuarioId);
+    Boolean existsUserById(Long userId);
 
-    UserModel getUserById(Long usuarioId);
+    UserModel getUserById(Long userId);
 
     UserModel getUserByEmail(String mail);
 }

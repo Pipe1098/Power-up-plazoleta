@@ -6,16 +6,26 @@ import com.example.foodcourtmicroservice.adapters.driving.http.mappers.IRestaura
 import com.example.foodcourtmicroservice.configuration.Constants;
 import com.example.foodcourtmicroservice.domain.api.IRestaurantExternalServicePort;
 import com.example.foodcourtmicroservice.domain.model.Restaurant;
+import com.example.foodcourtmicroservice.domain.model.UserModel;
 import com.example.foodcourtmicroservice.domain.spi.IRestaurantPersistencePort;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+
 public class FeignClientRestaurantAdapter implements IRestaurantExternalServicePort {
 
-    private final RestaurantFeignClient restaurantFeignClient;
-    private final IRestaurantPersistencePort restaurantPersistencePort;
-    private final IRestaurantRequestMapper restaurantRequestMapper;
+    private  RestaurantFeignClient restaurantFeignClient;
+    private  IRestaurantPersistencePort restaurantPersistencePort;
+    private  IRestaurantRequestMapper restaurantRequestMapper;
 
+    public FeignClientRestaurantAdapter(RestaurantFeignClient restaurantFeignClient, IRestaurantPersistencePort restaurantPersistencePort, IRestaurantRequestMapper restaurantRequestMapper) {
+        this.restaurantFeignClient = restaurantFeignClient;
+        this.restaurantPersistencePort = restaurantPersistencePort;
+        this.restaurantRequestMapper = restaurantRequestMapper;
+    }
+
+    public FeignClientRestaurantAdapter(RestaurantFeignClient restaurantFeignClient) {
+        this.restaurantFeignClient = restaurantFeignClient;
+    }
 
     @Override
     public void saveRestaurant(RestaurantRequestDto restaurantRequestDto) {
@@ -34,6 +44,16 @@ public class FeignClientRestaurantAdapter implements IRestaurantExternalServiceP
 
     @Override
     public String getIdOwnerFromToken(String token) {
+        return null;
+    }
+
+    @Override
+    public boolean existsUserById(Long idOwner) {
+        return false;
+    }
+
+    @Override
+    public UserModel getUserById(Long idOwner) {
         return null;
     }
 }

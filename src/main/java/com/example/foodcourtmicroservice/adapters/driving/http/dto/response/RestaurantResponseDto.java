@@ -9,8 +9,8 @@ public class RestaurantResponseDto {
     private Long id;
     private String name;
     private String nit;
-    private String direccion;
-    private String telefono;
+    private String adress;
+    private String phone;
     private String urlLogo;
     private Long idOwner;
 }
