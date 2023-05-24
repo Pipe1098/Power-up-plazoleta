@@ -32,7 +32,7 @@ class DishUseCaseTest {
     @MockBean
     IRestaurantPersistencePort restaurantPersistencePort;
     @MockBean
-    ICategoryPersistencePort categoriaPersistencePort;
+    ICategoryPersistencePort categoryPersistencePort;
     @MockBean
     IRestaurantExternalServicePort feignServicePort;
     @InjectMocks
@@ -79,7 +79,7 @@ class DishUseCaseTest {
                 "359874597",
                 2L
         ));
-        when(categoriaPersistencePort.getCategory(any())).thenReturn(new Category(
+        when(categoryPersistencePort.getCategory(any())).thenReturn(new Category(
                 2L,
                 "Italian",
                 "pizza mediana"
@@ -102,7 +102,7 @@ class DishUseCaseTest {
                 "url",
                 2L
         ));
-        when(categoriaPersistencePort.getCategory(any())).thenReturn(new Category(
+        when(categoryPersistencePort.getCategory(any())).thenReturn(new Category(
                 2L,
                 "name ",
                 "description"
@@ -123,7 +123,7 @@ class DishUseCaseTest {
                 "url",
                 6L
         ));
-        when(categoriaPersistencePort.getCategory(any())).thenReturn(new Category(
+        when(categoryPersistencePort.getCategory(any())).thenReturn(new Category(
                 2L,
                 "name",
                 "description"

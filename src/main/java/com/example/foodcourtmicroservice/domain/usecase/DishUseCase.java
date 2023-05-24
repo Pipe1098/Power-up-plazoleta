@@ -15,13 +15,13 @@ import com.example.foodcourtmicroservice.configuration.Constants;
 public class DishUseCase implements IDishServicePort {
     private final IDishPersistencePort dishPersistencePort;
     private final IRestaurantPersistencePort restaurantPersistencePort;
-    private final ICategoryPersistencePort categoriaPersistencePort;
+    private final ICategoryPersistencePort categoryPersistencePort;
     private final IRestaurantExternalServicePort feignServicePort;
 
-    public DishUseCase(IDishPersistencePort dishPersistencePort, IRestaurantPersistencePort restaurantPersistencePort, ICategoryPersistencePort categoriaPersistencePort, IRestaurantExternalServicePort feignServicePort) {
+    public DishUseCase(IDishPersistencePort dishPersistencePort, IRestaurantPersistencePort restaurantPersistencePort, ICategoryPersistencePort categoryPersistencePort, IRestaurantExternalServicePort feignServicePort) {
         this.dishPersistencePort = dishPersistencePort;
         this.restaurantPersistencePort = restaurantPersistencePort;
-        this.categoriaPersistencePort = categoriaPersistencePort;
+        this.categoryPersistencePort = categoryPersistencePort;
         this.feignServicePort = feignServicePort;
     }
     @Override
@@ -40,7 +40,7 @@ public class DishUseCase implements IDishServicePort {
             throw new OwnerAnotherRestaurantException(Constants.DIFFERENT_OWNER);
         }
 
-        Category category = categoriaPersistencePort.getCategory(dish.getIdCategoryAux());
+        Category category = categoryPersistencePort.getCategory(dish.getIdCategoryAux());
         dish.setIdCategory(category);
 
         this.dishPersistencePort.saveDish(dish);

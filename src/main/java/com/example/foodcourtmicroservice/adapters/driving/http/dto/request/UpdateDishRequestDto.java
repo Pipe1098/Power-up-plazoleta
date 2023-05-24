@@ -17,7 +17,7 @@ public class UpdateDishRequestDto {
     @NotNull
     private Long id;
     @Positive
-    @Pattern(regexp = "^[0-9]+$", message = "El price solo debe contener numeros")
+    @Pattern(regexp = "^[0-9]+$", message = "\n" + "The price must only contain numbers")
     private String price;
     private String description;
 }

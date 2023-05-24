@@ -17,12 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthRestController {
-    private final RestaurantFeignClient usuarioFeignClient;
+    private final RestaurantFeignClient userFeignClient;
     private final IAuthHandler authHandler;
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponseDto> login(@RequestBody @Valid AuthRequestDto authRequestDto) {
-        ResponseEntity<JwtResponseDto> token = usuarioFeignClient.login(authRequestDto);
+        ResponseEntity<JwtResponseDto> token = userFeignClient.login(authRequestDto);
         authHandler.saveToken(token.getBody().getToken());
         return token;
     }
