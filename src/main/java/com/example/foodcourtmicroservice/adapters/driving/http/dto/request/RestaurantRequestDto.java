@@ -11,11 +11,11 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class RestaurantRequestDto {
-    @Pattern(regexp = "^(?=.*[a-zA-Z])[a-zA-Z0-9]+$", message = "El nombre puede ser alfanúmerico pero no solo númerico")
+    @Pattern(regexp = "^(?=.*[a-zA-Z])[a-zA-Z0-9]+$", message = "El name puede ser alfanúmerico pero no solo númerico")
     @NotBlank
     private String name;
     @NotBlank(message = "La dirección es requerida")
-    private String direction;
+    private String adress;
     @Pattern(regexp = "^[0-9+]{1,13}$", message = "El telefono debe contener máximo 13 caracteres y puede contener el símbolo '+' al inicio")
     @NotBlank(message = "El telefono es requerido")
     private String phone;

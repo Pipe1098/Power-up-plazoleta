@@ -9,5 +9,5 @@ public interface IUserFeignClientPort {
 
     UserModel getUserById(Long usuarioId);
 
-    UserModel getUserByEmail(String correo);
+    UserModel getUserByEmail(String mail);
 }

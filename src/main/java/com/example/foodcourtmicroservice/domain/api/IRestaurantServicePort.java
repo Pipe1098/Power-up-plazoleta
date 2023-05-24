@@ -5,5 +5,4 @@ import com.example.foodcourtmicroservice.domain.model.Restaurant;
 public interface IRestaurantServicePort {
     void saveRestaurant(Restaurant restaurant);
 
-    Restaurant getRestaurantByIdOwner(Long idOwner);
 }
