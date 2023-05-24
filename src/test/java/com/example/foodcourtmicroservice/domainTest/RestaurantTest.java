@@ -43,7 +43,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             restaurant.setIdOwner(2L);
 
             UserModel userModel = new UserModel();
-            userModel.setRole(new RoleModel(2L, "PROPIETARIO", "Propietario"));
+            userModel.setRole(new RoleModel(2L, "OWNER ", "Owner"));
 
             Mockito.when(userFeignClient.existsUserById(restaurant.getIdOwner())).thenReturn(true);
             Mockito.when(userFeignClient.getUserById(restaurant.getIdOwner())).thenReturn(userModel);
@@ -103,7 +103,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             restaurant.setIdOwner(2L);
 
             UserModel userModel = new UserModel();
-            userModel.setRole(new RoleModel(2L, "PROPIETARIO", "Propietario"));
+            userModel.setRole(new RoleModel(2L, "OWNER ", "Owner"));
 
             Restaurant existingRestaurantModel = new Restaurant();
 

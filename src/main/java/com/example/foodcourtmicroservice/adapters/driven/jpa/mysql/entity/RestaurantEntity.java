@@ -20,7 +20,7 @@ public class RestaurantEntity {
     private Long id;
     @Column(unique = true)
     private String name;
-    private String direction;
+    private String adress;
     private String phone;
 
     private String urlLogotype;

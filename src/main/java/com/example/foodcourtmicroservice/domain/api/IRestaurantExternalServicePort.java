@@ -4,4 +4,8 @@ import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Resta
 
 public interface IRestaurantExternalServicePort {
     void saveRestaurant(RestaurantRequestDto restaurantRequestDto);
+
+    String getRolFromToken(String token);
+
+    String getIdOwnerFromToken(String token);
 }

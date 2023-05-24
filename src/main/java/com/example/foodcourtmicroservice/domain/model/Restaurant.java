@@ -3,16 +3,16 @@ package com.example.foodcourtmicroservice.domain.model;
 public class Restaurant {
     private Long id;
     private String name;
-    private String direction;
+    private String adress;
     private String phone;
     private String urlLogotype;
     private String nit;
     private Long idOwner;
 
-    public Restaurant(Long id, String name, String direction, String phone, String urlLogotype, String nit, Long idOwner) {
+    public Restaurant(Long id, String name, String adress, String phone, String urlLogotype, String nit, Long idOwner) {
         this.id = id;
         this.name = name;
-        this.direction = direction;
+        this.adress = adress;
         this.phone = phone;
         this.urlLogotype = urlLogotype;
         this.nit = nit;
@@ -40,11 +40,11 @@ public class Restaurant {
     }
 
     public String getDirection() {
-        return direction;
+        return adress;
     }
 
-    public void setDirection(String direction) {
-        this.direction = direction;
+    public void setDirection(String adress) {
+        this.adress = adress;
     }
 
     public String getPhone() {

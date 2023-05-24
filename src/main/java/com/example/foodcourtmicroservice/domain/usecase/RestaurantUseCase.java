@@ -25,16 +25,10 @@ public class RestaurantUseCase implements IRestaurantServicePort {
 
         if (user.getRole().getId() != 2) throw new UserMustBeOwnerException();
 
-        Restaurant restaurant2 =restaurantPersistencePort.getRestaurantByIdOwnwer(user.getId());
-        if(restaurant2 != null) throw new OwnerMustOnlyOwnARestaurantException();
-
         restaurantPersistencePort.saveRestaurant(restaurant);
     }
 
-    @Override
-    public Restaurant getRestaurantByIdOwner(Long idOwner) {
-        return restaurantPersistencePort.getRestaurantByIdOwnwer(idOwner);
-    }
+
 
 
 }
