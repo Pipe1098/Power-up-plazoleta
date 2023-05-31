@@ -3,6 +3,7 @@ package com.example.foodcourtmicroservice.domain.usecase;
 
 import com.example.foodcourtmicroservice.domain.api.IDishServicePort;
 import com.example.foodcourtmicroservice.domain.api.IRestaurantExternalServicePort;
+import com.example.foodcourtmicroservice.domain.exception.DishNoFoundException;
 import com.example.foodcourtmicroservice.domain.exception.OwnerAnotherRestaurantException;
 import com.example.foodcourtmicroservice.domain.model.Category;
 import com.example.foodcourtmicroservice.domain.model.Dish;
@@ -26,11 +27,11 @@ public class DishUseCase implements IDishServicePort {
     }
     @Override
     public void saveDish(Dish dish) {
-        String rolUserActual = feignServicePort.getRolFromToken(Token.getToken());
+        String rolUserActual = feignServicePort.getRoleFromToken(Token.getToken());
         ValidateAuthorization validateAuthorization = new ValidateAuthorization();
-        validateAuthorization.validarRol(rolUserActual,Constants.ROLE_OWNER);
+        validateAuthorization.validateRole(rolUserActual,Constants.ROLE_OWNER);
 
-        dish.setActivo(true);
+        dish.setActive(true);
 
         Long idOwner = Long.parseLong(feignServicePort.getIdOwnerFromToken(Token.getToken()));
         Restaurant restaurant = restaurantPersistencePort.getRestaurant(dish.getIdRestaurantAux());
@@ -47,9 +48,9 @@ public class DishUseCase implements IDishServicePort {
     }
     @Override
     public void updateDish(Long id,String price, String description) {
-        String rolUserActual = feignServicePort.getRolFromToken(Token.getToken());
+        String rolUserActual = feignServicePort.getRoleFromToken(Token.getToken());
         ValidateAuthorization validateAuthorization = new ValidateAuthorization();
-        validateAuthorization.validarRol(rolUserActual,Constants.ROLE_OWNER);
+        validateAuthorization.validateRole(rolUserActual,Constants.ROLE_OWNER);
 
         Dish dish = dishPersistencePort.getDish(id);
 
@@ -64,5 +65,24 @@ public class DishUseCase implements IDishServicePort {
             dish.setDescripcion(description);
         }
         dishPersistencePort.updateDish(dish);
+    }
+
+    @Override
+    public void updateEnableDisableDish(Long dishId, Long enableDisable) {
+        Dish dishModel= dishPersistencePort.getDish(dishId);
+        if(dishModel==null) throw new DishNoFoundException(Constants.UNREGISTERED_DISH);
+        String rolUserActual = feignServicePort.getRoleFromToken(Token.getToken());
+        ValidateAuthorization validateAuthorization = new ValidateAuthorization();
+        validateAuthorization.validateRole(rolUserActual,Constants.ROLE_OWNER);
+
+        Long idOwner = Long.parseLong(feignServicePort.getIdOwnerFromToken(Token.getToken()));
+        if(!idOwner.equals(dishModel.getIdRestaurant().getIdOwner())) {
+            throw new OwnerAnotherRestaurantException(Constants.DIFFERENT_OWNER);
+        }
+
+        boolean isEnableOrDisable = (enableDisable==1)?true:false;
+        dishModel.setActive(isEnableOrDisable);
+
+        dishPersistencePort.saveDish(dishModel);
     }
 }

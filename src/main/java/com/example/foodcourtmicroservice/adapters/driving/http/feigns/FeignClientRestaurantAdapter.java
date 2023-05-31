@@ -27,24 +27,24 @@ public class FeignClientRestaurantAdapter implements IRestaurantExternalServiceP
         this.restaurantFeignClient = restaurantFeignClient;
     }
 
-    @Override
+/*    @Override
     public void saveRestaurant(RestaurantRequestDto restaurantRequestDto) {
-        if(restaurantFeignClient.getUserByDni(restaurantRequestDto.getIdOwner()).getIdRole().getName().equals(Constants.ROLE_ADMIN)){
+        if(restaurantFeignClient.getUser(restaurantRequestDto.getIdOwner()).getIdRole().getName().equals(Constants.ROLE_ADMIN)){
             Restaurant restaurant = restaurantRequestMapper.toRestaurant(restaurantRequestDto);
             restaurantPersistencePort.saveRestaurant(restaurant);
         }   else{
             throw new UserNotPermissionException(Constants.USER_PERMISSION_DENIED);
         }
-    }
+    }*/
 
     @Override
-    public String getRolFromToken(String token) {
-        return null;
+    public String getRoleFromToken(String token) {
+        return restaurantFeignClient.roleUser(token);
     }
 
     @Override
     public String getIdOwnerFromToken(String token) {
-        return null;
+        return restaurantFeignClient.idUser(token);
     }
 
     @Override
@@ -53,7 +53,12 @@ public class FeignClientRestaurantAdapter implements IRestaurantExternalServiceP
     }
 
     @Override
-    public UserModel getUserById(Long idOwner) {
+    public boolean validateOwner(Long idOwner) {
+        return restaurantFeignClient.validateOwner(idOwner);
+    }
+
+    @Override
+    public UserModel getUserById(String idOwner) {
         return null;
     }
 }

@@ -36,8 +36,8 @@ public class BeanConfiguration {
     private final IDishEntityMapper dishEntityMapper;
     private final RestaurantFeignClient restaurantFeignClient;
     private final ICategoryRepository categoryRepository;
-    private final IRestaurantPersistencePort restaurantPersistencePort;
     private final ICategoryEntityMapper categoryEntityMapper;
+
 
     @Bean
     public IRestaurantServicePort restauranteServicePort(){
