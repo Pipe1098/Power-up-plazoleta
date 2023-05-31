@@ -1,5 +1,6 @@
 package com.example.foodcourtmicroservice.domain.usecase;
 
+import com.example.foodcourtmicroservice.configuration.Constants;
 import com.example.foodcourtmicroservice.domain.api.IRestaurantExternalServicePort;
 import com.example.foodcourtmicroservice.domain.api.IRestaurantServicePort;
 import com.example.foodcourtmicroservice.domain.exception.UserMustBeOwnerException;
@@ -9,25 +10,27 @@ import com.example.foodcourtmicroservice.domain.model.UserModel;
 import com.example.foodcourtmicroservice.domain.spi.IRestaurantPersistencePort;
 import com.example.foodcourtmicroservice.domain.spi.IUserFeignClientPort;
 
+import java.util.List;
+
 public class RestaurantUseCase implements IRestaurantServicePort {
     private final IRestaurantPersistencePort restaurantPersistencePort;
-    private  final IRestaurantExternalServicePort IuserFeignClient;
+    private  final IRestaurantExternalServicePort userFeignClient;
 
     public RestaurantUseCase(IRestaurantPersistencePort restaurantPersistencePort, IRestaurantExternalServicePort resFeignClient){
         this.restaurantPersistencePort = restaurantPersistencePort;
-        this.IuserFeignClient = resFeignClient;
+        this.userFeignClient = resFeignClient;
     }
     @Override
     public void saveRestaurant(Restaurant restaurant) {
 
-        boolean existUser = IuserFeignClient.existsUserById(restaurant.getIdOwner());
+        String roleActual = userFeignClient.getRoleFromToken(Token.getToken());
+        ValidateAuthorization.validateRole(roleActual,Constants.ROLE_ADMIN);
 
-        if (!existUser) throw new UserNotExistException();
-        UserModel user = IuserFeignClient.getUserById(restaurant.getIdOwner());
+        if(!userFeignClient.validateOwner(restaurant.getIdOwner())){
+            throw new UserMustBeOwnerException(Constants.USER_PERMISSION_DENIED);
+        }
 
-        if (user.getRole().getId() != 2) throw new UserMustBeOwnerException();
-
-        restaurantPersistencePort.saveRestaurant(restaurant);
+        this.restaurantPersistencePort.saveRestaurant(restaurant);
     }
 
     @Override
@@ -38,6 +41,11 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     @Override
     public UserModel getUserById(Long idOwner) {
         return null;
+    }
+
+    @Override
+    public List<Restaurant> getAllRestaurants() {
+        return restaurantPersistencePort.getAllRestaurants();
     }
 
 

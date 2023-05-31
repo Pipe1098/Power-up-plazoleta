@@ -5,9 +5,12 @@ import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.exceptions.Ni
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.IRestaurantEntityMapper;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.repositories.IRestaurantRepository;
 import com.example.foodcourtmicroservice.configuration.Constants;
+import com.example.foodcourtmicroservice.domain.exception.NoDataFoundException;
 import com.example.foodcourtmicroservice.domain.model.Restaurant;
 import com.example.foodcourtmicroservice.domain.spi.IRestaurantPersistencePort;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
@@ -33,6 +36,15 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
     @Override
     public Restaurant getRestaurantByIdOwnwer(Long id) {
         return null;
+    }
+
+    @Override
+    public List<Restaurant> getAllRestaurants() {
+        List<RestaurantEntity> restaurantEntityList = (List<RestaurantEntity>) restaurantRepository.findAll();
+        if(restaurantEntityList.isEmpty()){
+            throw  new NoDataFoundException("No data found");
+        }
+        return restaurantEntityMapper.toRestaurantList(restaurantEntityList);
     }
 
 

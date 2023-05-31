@@ -16,9 +16,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "user-microservice", url = "${external.usermicroservice.base-url}",configuration = FeignClientConfig.class)
 public interface RestaurantFeignClient {
 
-    @GetMapping("/users/{dniNumber}")
-    UserResponseDto getUserByDni(@PathVariable("dniNumber") String dniNumber);
+    @GetMapping("/user/validate-owner/{dni}")
+    Boolean validateOwner(@PathVariable("dniNumber") Long dni);
 
     @PostMapping(value = "/auth/login")
     ResponseEntity<JwtResponseDto> login(@RequestBody AuthRequestDto authRequestDto);
+
+    @GetMapping(value = "/auth/id/{token}")
+    String idUser(@PathVariable("token") String token);
+
+    @GetMapping(value = "/auth/role/{token}")
+    String roleUser(@PathVariable("token") String token);
+
+
 }
