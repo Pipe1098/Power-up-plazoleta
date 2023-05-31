@@ -4,13 +4,10 @@ import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.Resta
 import com.example.foodcourtmicroservice.domain.model.UserModel;
 
 public interface IRestaurantExternalServicePort {
-    void saveRestaurant(RestaurantRequestDto restaurantRequestDto);
-
-    String getRolFromToken(String token);
-
+    //void saveRestaurant(RestaurantRequestDto restaurantRequestDto);
+    String getRoleFromToken(String token);
     String getIdOwnerFromToken(String token);
-
     boolean existsUserById(Long idOwner);
-
-    UserModel getUserById(Long idOwner);
+    boolean validateOwner(Long idOwner);
+    UserModel getUserById(String idOwner);
 }
