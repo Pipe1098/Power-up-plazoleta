@@ -23,4 +23,9 @@ public class DishHandlerImpl implements IDishHandler {
     public void updateDish(UpdateDishRequestDto updateDishRequestDto) {
         dishServicePort.updateDish(updateDishRequestDto.getId(), updateDishRequestDto.getPrice(), updateDishRequestDto.getDescription());
     }
+
+    @Override
+    public void updateEnableDisableDish(Long dishId, Long enableDisable) {
+        dishServicePort.updateEnableDisableDish(dishId, enableDisable);
+    }
 }

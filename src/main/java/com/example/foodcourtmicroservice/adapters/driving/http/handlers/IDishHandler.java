@@ -7,4 +7,5 @@ import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.DishR
 public interface IDishHandler {
     void saveDish(DishRequestDto dishRequestDto);
     void updateDish(UpdateDishRequestDto updateDishRequestDto);
+    void updateEnableDisableDish(Long dishId, Long enableDisable);
 }

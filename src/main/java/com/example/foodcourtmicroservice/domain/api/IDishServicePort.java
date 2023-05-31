@@ -6,4 +6,6 @@ import com.example.foodcourtmicroservice.domain.model.Dish;
 public interface IDishServicePort {
     void saveDish(Dish dish);
     void updateDish(Long id, String price, String description);
+
+    void updateEnableDisableDish(Long dishId, Long enableDisable);
 }
