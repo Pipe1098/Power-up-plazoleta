@@ -8,6 +8,6 @@ public interface IRestaurantExternalServicePort {
     String getRoleFromToken(String token);
     String getIdOwnerFromToken(String token);
     boolean existsUserById(Long idOwner);
-    boolean validateOwner(Long idOwner);
+    boolean validateOwner(String idOwner);
     UserModel getUserById(String idOwner);
 }

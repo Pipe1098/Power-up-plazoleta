@@ -61,7 +61,7 @@ public class BeanConfiguration {
     }
     @Bean
     public IDishPersistencePort dishPersistencePort(){
-        return new DishMysqlAdapter(dishRepository,dishEntityMapper);
+        return new DishMysqlAdapter(dishRepository,dishEntityMapper,restaurantRepository);
     }
     @Bean
     public ICategoryPersistencePort categoryPersistencePort(){

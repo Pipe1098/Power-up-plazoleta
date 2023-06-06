@@ -16,6 +16,8 @@ public class Constants {
     public static final String PROVIDER_DESCRIPTION = "PROVIDER_ROLE";
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
     public static final String CATEGORY_NOT_FOUND = "The category is not registered.";
+    public static final String DISH_NOT_FOUND = "There isn't is dishes not available in this moment.";
+    public static final String RESTAURANT_NOT_FOUND = "There isn't restaurants available in this moment.";
     public static final String UNAUTHORIZED_USER = "The user is not authorized to perform this request.";
     public static final String MODIFIED_DISH = "The dish has been modified.";
     public static final String CREATED_DISH = "The dish has been created.";

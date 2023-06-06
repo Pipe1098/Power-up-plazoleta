@@ -13,6 +13,9 @@ import com.example.foodcourtmicroservice.domain.spi.IDishPersistencePort;
 import com.example.foodcourtmicroservice.domain.spi.IRestaurantPersistencePort;
 import com.example.foodcourtmicroservice.configuration.Constants;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DishUseCase implements IDishServicePort {
     private final IDishPersistencePort dishPersistencePort;
     private final IRestaurantPersistencePort restaurantPersistencePort;
@@ -34,14 +37,14 @@ public class DishUseCase implements IDishServicePort {
         dish.setActive(true);
 
         Long idOwner = Long.parseLong(feignServicePort.getIdOwnerFromToken(Token.getToken()));
-        Restaurant restaurant = restaurantPersistencePort.getRestaurant(dish.getIdRestaurantAux());
+        Restaurant restaurant = restaurantPersistencePort.getRestaurant(dish.getIdRestaurant().getId());
         if(idOwner.equals(restaurant.getIdOwner())){
             dish.setIdRestaurant(restaurant);
         } else{
             throw new OwnerAnotherRestaurantException(Constants.DIFFERENT_OWNER);
         }
 
-        Category category = categoryPersistencePort.getCategory(dish.getIdCategoryAux());
+        Category category = categoryPersistencePort.getCategory(dish.getIdCategory().getId());
         dish.setIdCategory(category);
 
         this.dishPersistencePort.saveDish(dish);
@@ -82,7 +85,31 @@ public class DishUseCase implements IDishServicePort {
 
         boolean isEnableOrDisable = (enableDisable==1)?true:false;
         dishModel.setActive(isEnableOrDisable);
-
         dishPersistencePort.saveDish(dishModel);
+    }
+
+    @Override
+    public List<Dish> findAllByRestaurantId(Long idRestaurante, Integer page, Integer size) {
+
+        List<Dish> dishList=dishPersistencePort.findAllByRestaurantId(idRestaurante, page,size);
+        List<Dish> ActiveDishes=new ArrayList<>();
+        for (Dish dish:dishList) {
+            if(dish.getActive()){
+                ActiveDishes.add(dish);
+            }
+        }
+        return ActiveDishes;
+    }
+
+    @Override
+    public List<Dish> findAllByRestaurantIdAndCategory(Long idRestaurante, String category, Integer page, Integer size) {
+        List<Dish> dishList=dishPersistencePort.findAllByRestaurantIdAndCategory(category,idRestaurante,page,size);
+        List<Dish> ActiveDishes=new ArrayList<>();
+        for (Dish dish:dishList) {
+            if(dish.getActive()){
+                ActiveDishes.add(dish);
+            }
+        }
+        return ActiveDishes;
     }
 }

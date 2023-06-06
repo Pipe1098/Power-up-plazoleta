@@ -9,6 +9,9 @@ import com.example.foodcourtmicroservice.domain.exception.NoDataFoundException;
 import com.example.foodcourtmicroservice.domain.model.Restaurant;
 import com.example.foodcourtmicroservice.domain.spi.IRestaurantPersistencePort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -42,10 +45,21 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
     public List<Restaurant> getAllRestaurants() {
         List<RestaurantEntity> restaurantEntityList = (List<RestaurantEntity>) restaurantRepository.findAll();
         if(restaurantEntityList.isEmpty()){
-            throw  new NoDataFoundException("No data found");
+            throw  new NoDataFoundException(Constants.RESTAURANT_NOT_FOUND);
         }
         return restaurantEntityMapper.toRestaurantList(restaurantEntityList);
     }
 
+    @Override
+    public List<Restaurant> getRestaurantsWithPagination(Integer page, Integer size) {
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
+        Page<RestaurantEntity> restaurantPage = restaurantRepository.findAll(pageable);
+        //List<RestaurantEntity> restaurantEntityList = (List<RestaurantEntity>) restaurantRepository.findAll(pageable);
+        List<RestaurantEntity> restaurantEntityList = restaurantPage.getContent();
+        if(restaurantEntityList.isEmpty()){
+            throw new NoDataFoundException(Constants.RESTAURANT_NOT_FOUND);
+        }
+        return restaurantEntityMapper.toRestaurantList(restaurantEntityList);
+    }
 
 }

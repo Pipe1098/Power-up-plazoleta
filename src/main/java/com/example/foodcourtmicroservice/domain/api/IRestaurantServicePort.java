@@ -13,4 +13,6 @@ public interface IRestaurantServicePort {
     UserModel getUserById(Long idOwner);
 
     List<Restaurant> getAllRestaurants();
+
+    List<Restaurant> getRestaurantsWithPagination(Integer page, Integer size);
 }

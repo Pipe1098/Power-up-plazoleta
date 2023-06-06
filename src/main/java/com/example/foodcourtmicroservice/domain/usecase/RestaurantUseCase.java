@@ -48,5 +48,10 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         return restaurantPersistencePort.getAllRestaurants();
     }
 
+    @Override
+    public List<Restaurant> getRestaurantsWithPagination(Integer page, Integer size) {
+        return restaurantPersistencePort.getRestaurantsWithPagination(page,size);
+    }
+
 
 }

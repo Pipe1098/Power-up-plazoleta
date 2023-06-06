@@ -8,13 +8,11 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        unmappedSourcePolicy =  ReportingPolicy.IGNORE)
+        unmappedSourcePolicy = ReportingPolicy.IGNORE)
+public interface IDishRequestMapper {
 
-public interface IDishRequestDtoMapper {
-
-    @Mapping(source = "idCategory", target = "idCategoryAux")
-    @Mapping(source = "idRestaurant", target = "idRestaurantAux")
-    @Mapping(target = "idRestaurant", ignore = true)
-    @Mapping(target = "idCategory", ignore = true)
+    @Mapping(target = "idRestaurant.id", source = "idRestaurant")
+    @Mapping(target = "idCategory.id", source = "idCategory")
     Dish toDish(DishRequestDto dishRequestDto);
+
 }

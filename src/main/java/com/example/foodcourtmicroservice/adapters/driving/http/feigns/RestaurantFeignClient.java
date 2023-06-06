@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface RestaurantFeignClient {
 
     @GetMapping("/user/validate-owner/{dni}")
-    Boolean validateOwner(@PathVariable("dniNumber") Long dni);
+    Boolean validateOwner(@PathVariable("dniNumber") String dni);
 
     @PostMapping(value = "/auth/login")
     ResponseEntity<JwtResponseDto> login(@RequestBody AuthRequestDto authRequestDto);
