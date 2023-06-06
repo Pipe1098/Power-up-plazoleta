@@ -13,4 +13,6 @@ public interface IRestaurantPersistencePort {
     Restaurant getRestaurantByIdOwnwer(Long id);
 
     List<Restaurant> getAllRestaurants();
+
+    List<Restaurant> getRestaurantsWithPagination(Integer page, Integer size);
 }

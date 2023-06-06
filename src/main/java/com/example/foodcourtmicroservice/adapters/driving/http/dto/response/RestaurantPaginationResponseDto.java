@@ -9,12 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RestaurantResponseDto {
-    private Long id;
+public class RestaurantPaginationResponseDto {
     private String name;
-    private String nit;
-    private String adress;
-    private String phone;
-    private String urlLogo;
-    private String idOwner;
+    private String urlLogotype;
 }

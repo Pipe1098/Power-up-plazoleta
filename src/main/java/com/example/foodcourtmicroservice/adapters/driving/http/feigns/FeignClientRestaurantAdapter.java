@@ -53,7 +53,7 @@ public class FeignClientRestaurantAdapter implements IRestaurantExternalServiceP
     }
 
     @Override
-    public boolean validateOwner(Long idOwner) {
+    public boolean validateOwner(String idOwner) {
         return restaurantFeignClient.validateOwner(idOwner);
     }
 

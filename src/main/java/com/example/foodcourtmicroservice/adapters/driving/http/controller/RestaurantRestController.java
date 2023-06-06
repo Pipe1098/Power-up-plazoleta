@@ -1,6 +1,7 @@
 package com.example.foodcourtmicroservice.adapters.driving.http.controller;
 
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.RestaurantRequestDto;
+import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.RestaurantPaginationResponseDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.RestaurantResponseDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.handlers.IRestaurantHandler;
 import com.example.foodcourtmicroservice.configuration.Constants;
@@ -35,8 +36,8 @@ public class RestaurantRestController {
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
                     @ApiResponse(responseCode = "409", description = "Restaurant already exists",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
-    @PostMapping("/")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("")
+    @PreAuthorize("hasAuthority('ADMIN_ROLE')")
     public ResponseEntity<Map<String, String>> createRestaurant(@Valid @RequestBody RestaurantRequestDto restaurantRequestDto) {
         restaurantHandler.saveRestaurant(restaurantRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -51,8 +52,22 @@ public class RestaurantRestController {
             @ApiResponse(responseCode = "404", description = "No data found", content = @Content)
     })
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('OWNER', 'ADMIN')")
+    @PreAuthorize("hasAnyAuthority('OWNER_ROLE', 'ADMIN_ROLE')")
     public ResponseEntity<List<RestaurantResponseDto>> getAllRestaurants() {
         return ResponseEntity.ok(restaurantHandler.getAllRestaurants());
     }
+
+    @Operation(summary = "Get all restaurants by page")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "All restaurants returned by page",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = RestaurantResponseDto.class)))),
+            @ApiResponse(responseCode = "404", description = "No data found", content = @Content)
+    })
+    @GetMapping("/page/{page}/size/{size}")
+    @PreAuthorize("hasAuthority('CLIENT_ROLE')")
+    public ResponseEntity<List<RestaurantPaginationResponseDto>> getAllRestaurantsPagination(@PathVariable(value = "page" )Integer page, @PathVariable(value = "size") Integer size) {
+        return ResponseEntity.ok(restaurantHandler.getRestaurantsWithPagination(page,size));
+    }
+
 }

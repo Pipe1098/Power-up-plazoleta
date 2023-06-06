@@ -2,20 +2,33 @@ package com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.adapter;
 
 
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.DishEntity;
+import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.RestaurantEntity;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.IDishEntityMapper;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.repositories.IDishRepository;
+import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.repositories.IRestaurantRepository;
 import com.example.foodcourtmicroservice.configuration.Constants;
+import com.example.foodcourtmicroservice.domain.exception.CategoryNotFoundException;
 import com.example.foodcourtmicroservice.domain.exception.DishNoFoundException;
+import com.example.foodcourtmicroservice.domain.exception.RestaurantNoFoundException;
 import com.example.foodcourtmicroservice.domain.model.Dish;
+import com.example.foodcourtmicroservice.domain.model.Restaurant;
 import com.example.foodcourtmicroservice.domain.spi.IDishPersistencePort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class DishMysqlAdapter implements IDishPersistencePort {
     private final IDishRepository dishRepository;
     private final IDishEntityMapper dishEntityMapper;
+    private final IRestaurantRepository restaurantRepository;
 
     @Override
     public void saveDish(Dish dish) {
@@ -35,4 +48,42 @@ public class DishMysqlAdapter implements IDishPersistencePort {
         }
         return dishEntityMapper.toDish(dishEntity.get());
     }
+
+    @Override
+    public List<Dish> findAllByRestaurantId(Long idRestaurant, Integer page, Integer size) {
+        Optional<RestaurantEntity> restaurantOptional = restaurantRepository.findById(idRestaurant);
+        if (restaurantOptional.isPresent()) {
+            Pageable pageable = PageRequest.of(page, size, Sort.by("idCategory"));
+            Page<DishEntity> dishPage = dishRepository.findAllByIdRestaurant(idRestaurant, pageable);
+            List<DishEntity> dishEntities = dishPage.getContent();
+            return dishEntities.stream()
+                    .map(dishEntityMapper::toDish)
+                    .collect(Collectors.toList());
+        } else {
+            throw new RestaurantNoFoundException(Constants.RESTAURANT_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public List<Dish> findAllByRestaurantIdAndCategory(String category,Long idRestaurant, Integer page, Integer size) {
+        Optional<RestaurantEntity> restaurantOptional = restaurantRepository.findById(idRestaurant);
+        if (restaurantOptional.isPresent()) {
+            Pageable pageable = PageRequest.of(page, size, Sort.by("idCategory"));
+            Page<DishEntity> dishPage = dishRepository.findAllByIdRestaurantAndIdCategory(idRestaurant, category, pageable);
+            List<DishEntity> dishEntities = dishPage.getContent();
+            if (dishEntities.isEmpty()) {
+                throw new CategoryNotFoundException(Constants.CATEGORY_NOT_FOUND);
+            }
+            return dishEntities.stream()
+                    .map(dishEntityMapper::toDish)
+                    .collect(Collectors.toList());
+        } else {
+            throw new RestaurantNoFoundException(Constants.RESTAURANT_NOT_FOUND);
+        }
+    }
+
 }
+
+
+
+

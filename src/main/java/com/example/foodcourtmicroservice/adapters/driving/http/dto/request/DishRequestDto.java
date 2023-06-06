@@ -22,10 +22,11 @@ public class DishRequestDto {
     private String description;
     @NotBlank
     @Positive
-    @Pattern(regexp = "^[0-9]+$", message = "El price solo debe contener numeros")
+    @Pattern(regexp = "^[0-9]+$", message = "Price must be numeric only")
     private String price;
     @NotNull
     private Long idRestaurant;
     @NotBlank
     private String urlImage;
+
 }

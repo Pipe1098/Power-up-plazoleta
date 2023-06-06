@@ -7,9 +7,9 @@ public class Restaurant {
     private String phone;
     private String urlLogotype;
     private String nit;
-    private Long idOwner;
+    private String idOwner;
 
-    public Restaurant(Long id, String name, String adress, String phone, String urlLogotype, String nit, Long idOwner) {
+    public Restaurant(Long id, String name, String adress, String phone, String urlLogotype, String nit, String idOwner) {
         this.id = id;
         this.name = name;
         this.adress = adress;
@@ -71,11 +71,11 @@ public class Restaurant {
         this.nit = nit;
     }
 
-    public Long getIdOwner() {
+    public String getIdOwner() {
         return idOwner;
     }
 
-    public void setIdOwner(Long idOwner) {
+    public void setIdOwner(String idOwner) {
         this.idOwner = idOwner;
     }
 }
