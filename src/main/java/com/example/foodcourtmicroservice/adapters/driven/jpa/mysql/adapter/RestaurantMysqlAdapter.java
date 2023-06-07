@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
@@ -32,8 +33,10 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
     }
 
     @Override
-    public Restaurant getRestaurant(Long idRestaurantAux) {
-        return null;
+    public Restaurant getRestaurant(Long idRestaurant) {
+        Optional<RestaurantEntity> restaurantEntity= restaurantRepository.findById(idRestaurant);
+       return restaurantEntityMapper.toRestaurant(restaurantEntity.get());
+
     }
 
     @Override

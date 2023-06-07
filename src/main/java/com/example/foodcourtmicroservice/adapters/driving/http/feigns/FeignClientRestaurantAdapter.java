@@ -1,14 +1,11 @@
 package com.example.foodcourtmicroservice.adapters.driving.http.feigns;
 
-import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.RestaurantRequestDto;
-import com.example.foodcourtmicroservice.adapters.driving.http.exceptions.UserNotPermissionException;
+
 import com.example.foodcourtmicroservice.adapters.driving.http.mappers.IRestaurantRequestMapper;
-import com.example.foodcourtmicroservice.configuration.Constants;
 import com.example.foodcourtmicroservice.domain.api.IRestaurantExternalServicePort;
-import com.example.foodcourtmicroservice.domain.model.Restaurant;
 import com.example.foodcourtmicroservice.domain.model.UserModel;
 import com.example.foodcourtmicroservice.domain.spi.IRestaurantPersistencePort;
-import lombok.RequiredArgsConstructor;
+
 
 
 public class FeignClientRestaurantAdapter implements IRestaurantExternalServicePort {
@@ -27,15 +24,6 @@ public class FeignClientRestaurantAdapter implements IRestaurantExternalServiceP
         this.restaurantFeignClient = restaurantFeignClient;
     }
 
-/*    @Override
-    public void saveRestaurant(RestaurantRequestDto restaurantRequestDto) {
-        if(restaurantFeignClient.getUser(restaurantRequestDto.getIdOwner()).getIdRole().getName().equals(Constants.ROLE_ADMIN)){
-            Restaurant restaurant = restaurantRequestMapper.toRestaurant(restaurantRequestDto);
-            restaurantPersistencePort.saveRestaurant(restaurant);
-        }   else{
-            throw new UserNotPermissionException(Constants.USER_PERMISSION_DENIED);
-        }
-    }*/
 
     @Override
     public String getRoleFromToken(String token) {
@@ -43,7 +31,7 @@ public class FeignClientRestaurantAdapter implements IRestaurantExternalServiceP
     }
 
     @Override
-    public String getIdOwnerFromToken(String token) {
+    public String getIdFromToken(String token) {
         return restaurantFeignClient.idUser(token);
     }
 

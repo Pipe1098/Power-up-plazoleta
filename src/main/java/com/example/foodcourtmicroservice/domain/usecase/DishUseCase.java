@@ -36,7 +36,7 @@ public class DishUseCase implements IDishServicePort {
 
         dish.setActive(true);
 
-        Long idOwner = Long.parseLong(feignServicePort.getIdOwnerFromToken(Token.getToken()));
+        Long idOwner = Long.parseLong(feignServicePort.getIdFromToken(Token.getToken()));
         Restaurant restaurant = restaurantPersistencePort.getRestaurant(dish.getIdRestaurant().getId());
         if(idOwner.equals(restaurant.getIdOwner())){
             dish.setIdRestaurant(restaurant);
@@ -57,7 +57,7 @@ public class DishUseCase implements IDishServicePort {
 
         Dish dish = dishPersistencePort.getDish(id);
 
-        Long idOwner = Long.parseLong(feignServicePort.getIdOwnerFromToken(Token.getToken()));
+        Long idOwner = Long.parseLong(feignServicePort.getIdFromToken(Token.getToken()));
         if(!idOwner.equals(dish.getIdRestaurant().getIdOwner())) {
             throw new OwnerAnotherRestaurantException(Constants.DIFFERENT_OWNER);
         }
@@ -78,7 +78,7 @@ public class DishUseCase implements IDishServicePort {
         ValidateAuthorization validateAuthorization = new ValidateAuthorization();
         validateAuthorization.validateRole(rolUserActual,Constants.ROLE_OWNER);
 
-        Long idOwner = Long.parseLong(feignServicePort.getIdOwnerFromToken(Token.getToken()));
+        Long idOwner = Long.parseLong(feignServicePort.getIdFromToken(Token.getToken()));
         if(!idOwner.equals(dishModel.getIdRestaurant().getIdOwner())) {
             throw new OwnerAnotherRestaurantException(Constants.DIFFERENT_OWNER);
         }
