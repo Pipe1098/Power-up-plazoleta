@@ -40,13 +40,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             restaurant.setDirection("cr 45");
             restaurant.setPhone("3002217575");
             restaurant.setUrlLogotype("http:/miplazoleta");
-            restaurant.setIdOwner(2L);
+            restaurant.setIdOwner("234");
 
             UserModel userModel = new UserModel();
             userModel.setRole(new RoleModel(2L, "OWNER ", "Owner"));
 
-            Mockito.when(userFeignClient.existsUserById(restaurant.getIdOwner())).thenReturn(true);
-            Mockito.when(userFeignClient.getUserById(restaurant.getIdOwner())).thenReturn(userModel);
+            Mockito.when(userFeignClient.existsUserById(Long.parseLong(restaurant.getIdOwner()))).thenReturn(true);
+            Mockito.when(userFeignClient.getUserById(Long.parseLong(restaurant.getIdOwner()))).thenReturn(userModel);
             Mockito.when(restaurantPersistencePort.getRestaurantByIdOwnwer(userModel.getId())).thenReturn(null);
 
             restaurantUseCase.saveRestaurant(restaurant);
@@ -63,9 +63,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             restaurant.setDirection("cr 45");
             restaurant.setPhone("3002217575");
             restaurant.setUrlLogotype("http:/miplazoleta");
-            restaurant.setIdOwner(2L);
+            restaurant.setIdOwner("2");
 
-            Mockito.when(userFeignClient.existsUserById(restaurant.getIdOwner())).thenReturn(false);
+            Mockito.when(userFeignClient.existsUserById(Long.parseLong(restaurant.getIdOwner()))).thenReturn(false);
             Assertions.assertThrows(UserNotExistException.class, () -> restaurantUseCase.saveRestaurant(restaurant));
         }
 
@@ -78,15 +78,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             restaurant.setDirection("cr 45");
             restaurant.setPhone("3002217575");
             restaurant.setUrlLogotype("http:/miplazoleta");
-            restaurant.setIdOwner(3L);
+            restaurant.setIdOwner("3");
 
 
             UserModel userModel = new UserModel();
             userModel.setRole(new RoleModel(3L, "EMPLEADO", "Empleado"));
 
 
-            Mockito.when(userFeignClient.existsUserById(restaurant.getIdOwner())).thenReturn(true);
-            Mockito.when(userFeignClient.getUserById(restaurant.getIdOwner())).thenReturn(userModel);
+            Mockito.when(userFeignClient.existsUserById(Long.parseLong(restaurant.getIdOwner()))).thenReturn(true);
+            Mockito.when(userFeignClient.getUserById(Long.parseLong(restaurant.getIdOwner()))).thenReturn(userModel);
 
             Assertions.assertThrows(UserMustBeOwnerException.class, () -> restaurantUseCase.saveRestaurant(restaurant));
         }
@@ -100,15 +100,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
             restaurant.setDirection("cr 45");
             restaurant.setPhone("3002217575");
             restaurant.setUrlLogotype("http:/miplazoleta");
-            restaurant.setIdOwner(2L);
+            restaurant.setIdOwner("2");
 
             UserModel userModel = new UserModel();
             userModel.setRole(new RoleModel(2L, "OWNER ", "Owner"));
 
             Restaurant existingRestaurantModel = new Restaurant();
 
-            Mockito.when(userFeignClient.existsUserById(restaurant.getIdOwner())).thenReturn(true);
-            Mockito.when(userFeignClient.getUserById(restaurant.getIdOwner())).thenReturn(userModel);
+            Mockito.when(userFeignClient.existsUserById(Long.parseLong(restaurant.getIdOwner()))).thenReturn(true);
+            Mockito.when(userFeignClient.getUserById(Long.parseLong(restaurant.getIdOwner()))).thenReturn(userModel);
             Mockito.when(restaurantPersistencePort.getRestaurantByIdOwnwer((userModel.getId()))).thenReturn(existingRestaurantModel);
 
             Assertions.assertThrows(OwnerMustOnlyOwnARestaurantException.class, () -> restaurantUseCase.saveRestaurant(restaurant));

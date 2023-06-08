@@ -43,7 +43,7 @@ public class OrderUseCase implements IOrderServicePort {
 @Override
 public void saveOrder(OrderRequestModel orderRequestModel) {
 
-    validateUserAuthentication();
+    //validateUserAuthentication();
 
     Long idClient = parseLong(userFeignClientPort.getIdFromToken(Token.getToken()));
 

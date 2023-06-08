@@ -50,7 +50,7 @@ class DishUseCaseTest {
                         "italian",
                         "description"
                 ),
-                2L,
+
                 "pizza mediana",
                 "25000",
                 new Restaurant(
@@ -59,17 +59,15 @@ class DishUseCaseTest {
                         "123",
                         "local",
                         "urlLogo",
-                        "3265874",
-                        2L
+                        "3265874","2"
                 ),
-                3L,
                 "urlImage",
                 true
         );
     }
     @Test
     void saveDish(){
-        when(feignServicePort.getRolFromToken(any())).thenReturn("ROLE_OWNER ");
+        when(feignServicePort.getRoleFromToken(any())).thenReturn("ROLE_OWNER ");
         when(restaurantPersistencePort.getRestaurant(any())).thenReturn(new Restaurant(
                 3L,
                 "name",
@@ -77,14 +75,14 @@ class DishUseCaseTest {
                 "local",
                 "UrlLogo",
                 "359874597",
-                2L
+                "2"
         ));
         when(categoryPersistencePort.getCategory(any())).thenReturn(new Category(
                 2L,
                 "Italian",
                 "pizza mediana"
         ));
-        when(feignServicePort.getIdOwnerFromToken(any())).thenReturn("2");
+        when(feignServicePort.getIdFromToken(any())).thenReturn("2");
 
         dishUseCase.saveDish(dish);
 
@@ -92,7 +90,7 @@ class DishUseCaseTest {
     }
     @Test
     void saveDishUserNoAutorized(){
-        when(feignServicePort.getRolFromToken(any())).thenReturn("ROLE_CLIENT");
+        when(feignServicePort.getRoleFromToken(any())).thenReturn("ROLE_CLIENT");
         when(restaurantPersistencePort.getRestaurant(any())).thenReturn(new Restaurant(
                 3L,
                 "name",
@@ -100,20 +98,20 @@ class DishUseCaseTest {
                 "local",
                 "3024261812",
                 "url",
-                2L
+                "2"
         ));
         when(categoryPersistencePort.getCategory(any())).thenReturn(new Category(
                 2L,
                 "name ",
                 "description"
         ));
-        when(feignServicePort.getIdOwnerFromToken(any())).thenReturn("2");
+        when(feignServicePort.getIdFromToken(any())).thenReturn("2");
 
         assertThrows(UserNoAutorizedException.class, () -> dishUseCase.saveDish(dish));
     }
     @Test
     void saveDishOwnerNoMatch(){
-        when(feignServicePort.getRolFromToken(any())).thenReturn("ROLE_OWNER ");
+        when(feignServicePort.getRoleFromToken(any())).thenReturn("ROLE_OWNER ");
         when(restaurantPersistencePort.getRestaurant(any())).thenReturn(new Restaurant(
                 3L,
                 "name",
@@ -121,22 +119,22 @@ class DishUseCaseTest {
                 "local",
                 "3024261812",
                 "url",
-                6L
+                "6"
         ));
         when(categoryPersistencePort.getCategory(any())).thenReturn(new Category(
                 2L,
                 "name",
                 "description"
         ));
-        when(feignServicePort.getIdOwnerFromToken(any())).thenReturn("2");
+        when(feignServicePort.getIdFromToken(any())).thenReturn("2");
 
         assertThrows(OwnerAnotherRestaurantException.class, () -> dishUseCase.saveDish(dish));
     }
     @Test
     void updateDish(){
         when(dishPersistencePort.getDish(any())).thenReturn(dish);
-        when(feignServicePort.getIdOwnerFromToken(any())).thenReturn("2");
-        when(feignServicePort.getRolFromToken(any())).thenReturn("ROLE_OWNER ");
+        when(feignServicePort.getIdFromToken(any())).thenReturn("2");
+        when(feignServicePort.getRoleFromToken(any())).thenReturn("ROLE_OWNER ");
 
         dishUseCase.updateDish(1L,"1000","dish updatesdd");
 
@@ -145,16 +143,16 @@ class DishUseCaseTest {
     @Test
     void updateDishUserNoAutorized(){
         when(dishPersistencePort.getDish(any())).thenReturn(dish);
-        when(feignServicePort.getIdOwnerFromToken(any())).thenReturn("2");
-        when(feignServicePort.getRolFromToken(any())).thenReturn("ROLE_CLIENT");
+        when(feignServicePort.getIdFromToken(any())).thenReturn("2");
+        when(feignServicePort.getRoleFromToken(any())).thenReturn("ROLE_CLIENT");
 
         assertThrows(UserNoAutorizedException.class, () -> dishUseCase.updateDish(1L,"1000","dish updated"));
     }
     @Test
     void updateDishOwnerNoMatch(){
         when(dishPersistencePort.getDish(any())).thenReturn(dish);
-        when(feignServicePort.getIdOwnerFromToken(any())).thenReturn("3");
-        when(feignServicePort.getRolFromToken(any())).thenReturn("ROLE_OWNER ");
+        when(feignServicePort.getIdFromToken(any())).thenReturn("3");
+        when(feignServicePort.getRoleFromToken(any())).thenReturn("ROLE_OWNER ");
 
         assertThrows(OwnerAnotherRestaurantException.class, () -> dishUseCase.updateDish(2L,"1000","dish updated"));
     }

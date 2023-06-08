@@ -40,7 +40,6 @@ public class BeanConfiguration {
 
     private final IRestaurantRepository restaurantRepository;
     private final IRestaurantEntityMapper restaurantEntityMapper;
-    private final IRestaurantExternalServicePort userFeignClient;
     private final IDishRepository dishRepository;
     private final IDishEntityMapper dishEntityMapper;
     private final RestaurantFeignClient restaurantFeignClient;
@@ -60,6 +59,7 @@ public class BeanConfiguration {
     public IAuthServicePort authServicePort(){
         return new AuthUseCase();
     }
+
     @Bean
     public IRestaurantExternalServicePort feignServicePort(){
         return new FeignClientRestaurantAdapter(restaurantFeignClient);
