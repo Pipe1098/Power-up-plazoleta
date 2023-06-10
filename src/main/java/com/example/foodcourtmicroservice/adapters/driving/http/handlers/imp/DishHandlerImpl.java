@@ -46,7 +46,7 @@ public class DishHandlerImpl implements IDishHandler {
     }
 
     @Override
-    public List<DishResponseDto> findAllByRestaurantIdAndCategory(Long idRestaurante, String category, Integer page, Integer size) {
+    public List<DishResponseDto> findAllByRestaurantIdAndCategory(Long idRestaurante, Long category, Integer page, Integer size) {
         List<Dish> dishList = dishServicePort.findAllByRestaurantIdAndCategory(idRestaurante,category,page,size);
         if(dishList.isEmpty()){
             throw new NoDataFoundException(Constants.DISH_NOT_FOUND);

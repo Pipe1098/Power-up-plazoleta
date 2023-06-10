@@ -15,7 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +37,7 @@ public class DishRestController {
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))
             })
     @PostMapping("")
-    @PreAuthorize("hasAuthority('OWNER_ROLE')")
+  //  @PreAuthorize("hasAuthority('OWNER_ROLE')")
     public ResponseEntity<Map<String,String>> saveDish(@Valid @RequestBody DishRequestDto dishRequestDto){
         dishHandler.saveDish(dishRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -53,7 +53,7 @@ public class DishRestController {
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))
             })
     @PatchMapping ("/")
-    @PreAuthorize("hasAuthority('OWNER_ROLE')")
+    //@PreAuthorize("hasAuthority('OWNER_ROLE')")
     public ResponseEntity<Map<String,String>> updateDish(@Valid @RequestBody UpdateDishRequestDto updateDishRequestDto){
         dishHandler.updateDish(updateDishRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -69,7 +69,7 @@ public class DishRestController {
             @ApiResponse(responseCode = "404", description = "No data found", content = @Content)
     })
     @PutMapping("/{id}/activate/{enableDisable}")
-    @PreAuthorize("hasAuthority('OWNER_ROLE')")
+   // @PreAuthorize("hasAuthority('OWNER_ROLE')")
     public ResponseEntity<DishRequestDto> updateEnableDisableDish(@PathVariable(value = "id")Long dishId, @PathVariable(value = "enableDisable")Long enableDisable){
         dishHandler.updateEnableDisableDish(dishId, enableDisable);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -83,16 +83,16 @@ public class DishRestController {
                             array = @ArraySchema(schema = @Schema(implementation = DishResponseDto.class)))),
             @ApiResponse(responseCode = "404", description = "No data found", content = @Content)
     })
-    @PreAuthorize("hasAuthority('CLIENT_ROLE')")
-    @GetMapping("/{idRestaurante}/page/{page}/size/{size}")
+  //  @PreAuthorize("hasAuthority('CLIENT_ROLE')")
+    @GetMapping("/{idRestaurant}/page/{page}/size/{size}")
     public ResponseEntity<List<DishResponseDto>> getAllDishesByRestaurant(
-            @PathVariable(value = "idRestaurante") Long idRestaurante,
+            @PathVariable(value = "idRestaurant") Long idRestaurante,
             @PathVariable(value = "page") Integer page,
             @PathVariable(value = "size") Integer size,
-            @RequestParam(value = "category", required = false) String category
+            @RequestParam(value = "category", required = false) Long category
     ) {
         List<DishResponseDto> dishes;
-        if (category != null && !category.isEmpty()) {
+        if (category != null) {
             dishes = dishHandler.findAllByRestaurantIdAndCategory(idRestaurante, category, page, size);
         } else {
             dishes = dishHandler.findAllByRestaurantId(idRestaurante, page, size);

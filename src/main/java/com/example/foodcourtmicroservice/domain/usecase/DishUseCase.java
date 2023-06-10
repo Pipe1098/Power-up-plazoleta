@@ -30,19 +30,19 @@ public class DishUseCase implements IDishServicePort {
     }
     @Override
     public void saveDish(Dish dish) {
-        String rolUserActual = feignServicePort.getRoleFromToken(Token.getToken());
-        ValidateAuthorization validateAuthorization = new ValidateAuthorization();
-        validateAuthorization.validateRole(rolUserActual,Constants.ROLE_OWNER);
+       // String rolUserActual = feignServicePort.getRoleFromToken(Token.getToken());
+        //ValidateAuthorization validateAuthorization = new ValidateAuthorization();
+       // validateAuthorization.validateRole(rolUserActual,Constants.ROLE_OWNER);
 
         dish.setActive(true);
 
-        Long idOwner = Long.parseLong(feignServicePort.getIdFromToken(Token.getToken()));
+    /*    Long idOwner = Long.parseLong(feignServicePort.getIdFromToken(Token.getToken()));
         Restaurant restaurant = restaurantPersistencePort.getRestaurant(dish.getIdRestaurant().getId());
         if(idOwner.equals(restaurant.getIdOwner())){
             dish.setIdRestaurant(restaurant);
         } else{
             throw new OwnerAnotherRestaurantException(Constants.DIFFERENT_OWNER);
-        }
+        }*/
 
         Category category = categoryPersistencePort.getCategory(dish.getIdCategory().getId());
         dish.setIdCategory(category);
@@ -102,7 +102,7 @@ public class DishUseCase implements IDishServicePort {
     }
 
     @Override
-    public List<Dish> findAllByRestaurantIdAndCategory(Long idRestaurante, String category, Integer page, Integer size) {
+    public List<Dish> findAllByRestaurantIdAndCategory(Long idRestaurante, Long category, Integer page, Integer size) {
         List<Dish> dishList=dishPersistencePort.findAllByRestaurantIdAndCategory(category,idRestaurante,page,size);
         List<Dish> ActiveDishes=new ArrayList<>();
         for (Dish dish:dishList) {

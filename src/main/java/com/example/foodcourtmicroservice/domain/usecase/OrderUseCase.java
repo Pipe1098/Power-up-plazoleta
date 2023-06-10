@@ -1,5 +1,7 @@
 package com.example.foodcourtmicroservice.domain.usecase;
 
+import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.OrderResponseDto;
+import com.example.foodcourtmicroservice.adapters.driving.http.mappers.IOrderResponseMapper;
 import com.example.foodcourtmicroservice.configuration.Constants;
 import com.example.foodcourtmicroservice.domain.api.IOrderServicePort;
 import com.example.foodcourtmicroservice.domain.api.IRestaurantExternalServicePort;
@@ -15,10 +17,15 @@ import com.example.foodcourtmicroservice.domain.model.OrderDishModel;
 import com.example.foodcourtmicroservice.domain.model.OrderDishRequestModel;
 import com.example.foodcourtmicroservice.domain.model.OrderModel;
 import com.example.foodcourtmicroservice.domain.model.OrderRequestModel;
+import com.example.foodcourtmicroservice.domain.model.OrderResponseModel;
 import com.example.foodcourtmicroservice.domain.model.Restaurant;
 import com.example.foodcourtmicroservice.domain.spi.IDishPersistencePort;
 import com.example.foodcourtmicroservice.domain.spi.IOrderPersistencePort;
 import com.example.foodcourtmicroservice.domain.spi.IRestaurantPersistencePort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,12 +37,14 @@ public class OrderUseCase implements IOrderServicePort {
     private final IRestaurantPersistencePort restaurantPersistencePort;
     private final IDishPersistencePort dishPersistencePort;
     private final IRestaurantExternalServicePort userFeignClientPort;
+    private final IOrderResponseMapper orderResponseMapper;
     private final IOrderPersistencePort orderPersistencePort;
 
-    public OrderUseCase(IRestaurantPersistencePort restaurantPersistencePort, IDishPersistencePort dishPersistencePort, IRestaurantExternalServicePort userFeignClientPort, IOrderPersistencePort orderPersistencePort) {
+    public OrderUseCase(IRestaurantPersistencePort restaurantPersistencePort, IDishPersistencePort dishPersistencePort, IRestaurantExternalServicePort userFeignClientPort, IOrderResponseMapper orderResponseMapper, IOrderPersistencePort orderPersistencePort) {
         this.restaurantPersistencePort = restaurantPersistencePort;
         this.dishPersistencePort = dishPersistencePort;
         this.userFeignClientPort = userFeignClientPort;
+        this.orderResponseMapper = orderResponseMapper;
         this.orderPersistencePort = orderPersistencePort;
     }
 
@@ -43,7 +52,7 @@ public class OrderUseCase implements IOrderServicePort {
 @Override
 public void saveOrder(OrderRequestModel orderRequestModel) {
 
-    //validateUserAuthentication();
+     validateUserAuthentication();
 
     Long idClient = parseLong(userFeignClientPort.getIdFromToken(Token.getToken()));
 
@@ -60,6 +69,19 @@ public void saveOrder(OrderRequestModel orderRequestModel) {
     OrderModel order = saveOrder(orderModel);
     saveOrderDishes(order, orderDishes);
 }
+    @Override
+    public List<OrderResponseModel> getAllOrdersWithPagination(Integer page, Integer size, String state) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<OrderModel> orderPage;
+        if (state != null && !state.isEmpty()) {
+            orderPage = dishPersistencePort.findByState(state, pageable);
+        } else {
+            orderPage = dishPersistencePort.findAll(pageable);
+        }
+        List<OrderModel> orderList = orderPage.getContent();
+
+        return orderResponseMapper.toResponseModelList(orderList);
+    }
 
     private void validateUserAuthentication() {
         if (Token.getToken() == null) {

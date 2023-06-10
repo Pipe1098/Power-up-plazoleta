@@ -11,6 +11,7 @@ import com.example.foodcourtmicroservice.domain.exception.CategoryNotFoundExcept
 import com.example.foodcourtmicroservice.domain.exception.DishNoFoundException;
 import com.example.foodcourtmicroservice.domain.exception.RestaurantNoFoundException;
 import com.example.foodcourtmicroservice.domain.model.Dish;
+import com.example.foodcourtmicroservice.domain.model.OrderModel;
 import com.example.foodcourtmicroservice.domain.model.Restaurant;
 import com.example.foodcourtmicroservice.domain.spi.IDishPersistencePort;
 import lombok.RequiredArgsConstructor;
@@ -53,9 +54,10 @@ public class DishMysqlAdapter implements IDishPersistencePort {
     public List<Dish> findAllByRestaurantId(Long idRestaurant, Integer page, Integer size) {
         Optional<RestaurantEntity> restaurantOptional = restaurantRepository.findById(idRestaurant);
         if (restaurantOptional.isPresent()) {
-            Pageable pageable = PageRequest.of(page, size, Sort.by("idCategory"));
-            Page<DishEntity> dishPage = dishRepository.findAllByIdRestaurant(idRestaurant, pageable);
+            Pageable pageable = PageRequest.of(page, size, Sort.by("name"));
+            Page<DishEntity> dishPage = dishRepository.findAll(pageable);
             List<DishEntity> dishEntities = dishPage.getContent();
+            System.out.println(dishEntities);
             return dishEntities.stream()
                     .map(dishEntityMapper::toDish)
                     .collect(Collectors.toList());
@@ -65,11 +67,11 @@ public class DishMysqlAdapter implements IDishPersistencePort {
     }
 
     @Override
-    public List<Dish> findAllByRestaurantIdAndCategory(String category,Long idRestaurant, Integer page, Integer size) {
+    public List<Dish> findAllByRestaurantIdAndCategory(Long category,Long idRestaurant, Integer page, Integer size) {
         Optional<RestaurantEntity> restaurantOptional = restaurantRepository.findById(idRestaurant);
         if (restaurantOptional.isPresent()) {
             Pageable pageable = PageRequest.of(page, size, Sort.by("idCategory"));
-            Page<DishEntity> dishPage = dishRepository.findAllByIdRestaurantAndIdCategory(idRestaurant, category, pageable);
+            Page<DishEntity> dishPage = dishRepository.findAllByIdRestaurantIdAndIdCategoryId(idRestaurant, category, pageable);
             List<DishEntity> dishEntities = dishPage.getContent();
             if (dishEntities.isEmpty()) {
                 throw new CategoryNotFoundException(Constants.CATEGORY_NOT_FOUND);
@@ -80,6 +82,16 @@ public class DishMysqlAdapter implements IDishPersistencePort {
         } else {
             throw new RestaurantNoFoundException(Constants.RESTAURANT_NOT_FOUND);
         }
+    }
+
+    @Override
+    public Page<OrderModel> findByState(String state, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<OrderModel> findAll(Pageable pageable) {
+        return null;
     }
 
 }

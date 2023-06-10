@@ -36,7 +36,7 @@ class OrderUseCaseTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        orderUseCase = new OrderUseCase(restaurantPersistencePort, dishPersistencePort, userFeignClientPort, orderPersistencePort);
+        orderUseCase = new OrderUseCase(restaurantPersistencePort, dishPersistencePort, userFeignClientPort, orderResponseMapper, orderPersistencePort);
     }
 
     @Test
@@ -45,20 +45,28 @@ class OrderUseCaseTest {
         OrderRequestModel orderRequestModel = createValidOrderRequestModel();
         Long idClient = 1L;
         Restaurant restaurant = createRestaurant();
+        Dish dish = createDish();
         List<OrderDishRequestModel> orderDishes = createOrderDishes();
+       // Token token = mock(Token.class);
+        Dish dishMock = mock(Dish.class);
 
+// Configurar el comportamiento del método getIdRestaurant()
+        when(dishMock.getIdRestaurant()).thenReturn(restaurant);
         when(userFeignClientPort.getIdFromToken(Token.getToken())).thenReturn(String.valueOf(idClient));
         when(restaurantPersistencePort.getRestaurant(orderRequestModel.getResturantId())).thenReturn(restaurant);
-        when(dishPersistencePort.getDish(anyLong())).thenReturn(createDish());
-
+        when(dishPersistencePort.getDish(anyLong())).thenReturn(dish);
+        when(dishPersistencePort.getDish(anyLong())).thenReturn(dish);
+        when( orderPersistencePort.existsByIdClientAndState(anyLong(), anyString())).thenReturn(false);
+        when(dishMock.getActive()).thenReturn(true);
 
         // Act
         orderUseCase.saveOrder(orderRequestModel);
 
         // Assert
         verify(orderPersistencePort, times(1)).saveOrder(any(OrderModel.class));
-        verify(orderPersistencePort, times(orderDishes.size())).saveOrderDish(anyList());
+        verify(orderPersistencePort, times(1)).saveOrderDish(anyList());
     }
+
 
     private OrderRequestModel createValidOrderRequestModel() {
         OrderRequestModel orderRequestModel = new OrderRequestModel();
@@ -106,6 +114,7 @@ class OrderUseCaseTest {
         Dish dish = new Dish();
         dish.setId(1L);
         dish.setname("Dish Test");
+        dish.setIdRestaurant(createRestaurant());
 
 
         return dish;

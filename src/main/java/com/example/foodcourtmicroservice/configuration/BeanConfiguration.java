@@ -17,6 +17,7 @@ import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.repositories.
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.repositories.IRestaurantRepository;
 import com.example.foodcourtmicroservice.adapters.driving.http.feigns.FeignClientRestaurantAdapter;
 import com.example.foodcourtmicroservice.adapters.driving.http.feigns.RestaurantFeignClient;
+import com.example.foodcourtmicroservice.adapters.driving.http.mappers.IOrderResponseMapper;
 import com.example.foodcourtmicroservice.domain.api.IAuthServicePort;
 import com.example.foodcourtmicroservice.domain.api.IDishServicePort;
 import com.example.foodcourtmicroservice.domain.api.IOrderServicePort;
@@ -49,6 +50,7 @@ public class BeanConfiguration {
     private final IOrderEntityMapper orderEntityMapper;
     private final IOrderDishRepository orderDishRepository;
     private final IOrderDishEntityMapper orderDishEntityMapper;
+    private final IOrderResponseMapper orderResponseMapper;
 
 
     @Bean
@@ -83,7 +85,7 @@ public class BeanConfiguration {
 
     @Bean
     public IOrderServicePort orderServicePort(){
-        return new OrderUseCase(restaurantPersistencePort(),dishPersistencePort(),feignServicePort(),orderPersistencePort());
+        return new OrderUseCase(restaurantPersistencePort(),dishPersistencePort(),feignServicePort(), orderResponseMapper, orderPersistencePort());
     }
     @Bean
     public IOrderPersistencePort orderPersistencePort(){
