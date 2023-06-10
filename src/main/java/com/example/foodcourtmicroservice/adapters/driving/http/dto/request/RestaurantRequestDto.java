@@ -15,7 +15,7 @@ public class RestaurantRequestDto {
     @NotBlank
     private String name;
     @NotBlank(message = "The address is required")
-    private String address;
+    private String adress;
     @Pattern(regexp = "^[0-9+]{1,13}$", message = "The phone must contain a maximum of 13 characters and can include the symbol '+' at the beginning")
     @NotBlank(message = "The phone is required")
     private String phone;
@@ -25,7 +25,6 @@ public class RestaurantRequestDto {
     @NotBlank(message = "The NIT is required")
     private String nit;
     @NotNull(message = "The idOwner cannot be null")
-    @Min(value = 1, message = "The idOwner must be greater than zero")
     @NotBlank(message = "The idOwner is required")
     private String idOwner;
 }

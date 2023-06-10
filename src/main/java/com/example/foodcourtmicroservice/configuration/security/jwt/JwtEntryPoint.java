@@ -1,4 +1,4 @@
-package com.example.foodcourtmicroservice.configuration.security.jwt;
+/*package com.example.foodcourtmicroservice.configuration.security.jwt;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,11 +15,11 @@ import java.io.IOException;
 @Component
 public class JwtEntryPoint implements AuthenticationEntryPoint {
 
-    @Autowired
+ *//*   @Autowired
     @Qualifier("handlerExceptionResolver")
     private HandlerExceptionResolver resolve;
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         resolve.resolveException(request, response, null, exception);
-    }
-}
+    }*//*
+}*/

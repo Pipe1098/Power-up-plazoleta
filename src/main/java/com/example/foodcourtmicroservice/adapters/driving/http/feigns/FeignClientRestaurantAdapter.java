@@ -11,14 +11,8 @@ import com.example.foodcourtmicroservice.domain.spi.IRestaurantPersistencePort;
 public class FeignClientRestaurantAdapter implements IRestaurantExternalServicePort {
 
     private  RestaurantFeignClient restaurantFeignClient;
-    private  IRestaurantPersistencePort restaurantPersistencePort;
-    private  IRestaurantRequestMapper restaurantRequestMapper;
 
-    public FeignClientRestaurantAdapter(RestaurantFeignClient restaurantFeignClient, IRestaurantPersistencePort restaurantPersistencePort, IRestaurantRequestMapper restaurantRequestMapper) {
-        this.restaurantFeignClient = restaurantFeignClient;
-        this.restaurantPersistencePort = restaurantPersistencePort;
-        this.restaurantRequestMapper = restaurantRequestMapper;
-    }
+
 
     public FeignClientRestaurantAdapter(RestaurantFeignClient restaurantFeignClient) {
         this.restaurantFeignClient = restaurantFeignClient;

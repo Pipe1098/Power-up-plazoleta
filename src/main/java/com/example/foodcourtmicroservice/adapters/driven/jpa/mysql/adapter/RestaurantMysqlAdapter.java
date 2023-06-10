@@ -13,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,8 +59,9 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
     public List<Restaurant> getRestaurantsWithPagination(Integer page, Integer size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
         Page<RestaurantEntity> restaurantPage = restaurantRepository.findAll(pageable);
-        //List<RestaurantEntity> restaurantEntityList = (List<RestaurantEntity>) restaurantRepository.findAll(pageable);
+
         List<RestaurantEntity> restaurantEntityList = restaurantPage.getContent();
+        System.out.println(restaurantEntityList);
         if(restaurantEntityList.isEmpty()){
             throw new NoDataFoundException(Constants.RESTAURANT_NOT_FOUND);
         }

@@ -11,5 +11,5 @@ public interface IDishHandler {
     void updateDish(UpdateDishRequestDto updateDishRequestDto);
     void updateEnableDisableDish(Long dishId, Long enableDisable);
     List<DishResponseDto> findAllByRestaurantId(Long idRestaurante, Integer page, Integer size);
-    List<DishResponseDto> findAllByRestaurantIdAndCategory(Long idRestaurante, String category, Integer page, Integer size);
+    List<DishResponseDto> findAllByRestaurantIdAndCategory(Long idRestaurante, Long category, Integer page, Integer size);
 }

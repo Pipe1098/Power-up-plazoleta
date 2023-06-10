@@ -16,7 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -36,9 +36,9 @@ public class RestaurantRestController {
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
                     @ApiResponse(responseCode = "409", description = "Restaurant already exists",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))})
-    @PostMapping("")
-    @PreAuthorize("hasAuthority('ADMIN_ROLE')")
-    public ResponseEntity<Map<String, String>> createRestaurant(@Valid @RequestBody RestaurantRequestDto restaurantRequestDto) {
+    @PostMapping("/")
+   // @PreAuthorize("hasAuthority('ADMIN_ROLE')")
+    public ResponseEntity<Map<String, String>> createRestaurant( @RequestBody RestaurantRequestDto restaurantRequestDto) {
         restaurantHandler.saveRestaurant(restaurantRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY, Constants.RESTAURANT_CREATED_MESSAGE));
@@ -52,7 +52,7 @@ public class RestaurantRestController {
             @ApiResponse(responseCode = "404", description = "No data found", content = @Content)
     })
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('OWNER_ROLE', 'ADMIN_ROLE')")
+   // @PreAuthorize("hasAnyAuthority('OWNER_ROLE', 'ADMIN_ROLE')")
     public ResponseEntity<List<RestaurantResponseDto>> getAllRestaurants() {
         return ResponseEntity.ok(restaurantHandler.getAllRestaurants());
     }
@@ -61,11 +61,11 @@ public class RestaurantRestController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "All restaurants returned by page",
                     content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = RestaurantResponseDto.class)))),
+                            array = @ArraySchema(schema = @Schema(implementation = RestaurantPaginationResponseDto.class)))),
             @ApiResponse(responseCode = "404", description = "No data found", content = @Content)
     })
     @GetMapping("/page/{page}/size/{size}")
-    @PreAuthorize("hasAuthority('CLIENT_ROLE')")
+   // @PreAuthorize("hasAuthority('CLIENT_ROLE')")
     public ResponseEntity<List<RestaurantPaginationResponseDto>> getAllRestaurantsPagination(@PathVariable(value = "page" )Integer page, @PathVariable(value = "size") Integer size) {
         return ResponseEntity.ok(restaurantHandler.getRestaurantsWithPagination(page,size));
     }

@@ -39,11 +39,11 @@ public class Restaurant {
         this.name = name;
     }
 
-    public String getDirection() {
+    public String getAdress() {
         return adress;
     }
 
-    public void setDirection(String adress) {
+    public void setAdress(String adress) {
         this.adress = adress;
     }
 

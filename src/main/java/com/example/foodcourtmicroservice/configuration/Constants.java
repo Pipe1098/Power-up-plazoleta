@@ -18,10 +18,12 @@ public class Constants {
     public static final String CATEGORY_NOT_FOUND = "The category is not registered.";
     public static final String DISH_NOT_FOUND = "There isn't is dishes not available in this moment.";
     public static final String DISH_NOT_EXIST= "The dish doesn't exist";
-    public static final String DISH_NOT_ACTIVE= "The dish   isn't active";
+    public static final String DISH_NOT_ACTIVE= "The dish isn't active";
     public static final String DISH_IDRESTAURANT_DIFERENT= "The dish idrestaurant is diferent that the order idrestaurant";
     public static final String NOT_DATA_FOUND_DISH = "No dishes found in this order.";
-    public static final String RESTAURANT_NOT_FOUND = "There isn't restaurants whit id provided";
+    public static final String RESPONSE_ERROR_MESSAGE_KEY = "error";
+    public static final String NO_DATA_FOUND_MESSAGE = "No data found for the requested petition";
+    public static final String RESTAURANT_NOT_FOUND = "There isn't restaurants in this moment";
     public static final String STATE_PENDING = "PENDING";
     public static final String STATE_IN_PREPARATION = "IN_PREPARATION";
     public static final String STATE_READY = "READY";

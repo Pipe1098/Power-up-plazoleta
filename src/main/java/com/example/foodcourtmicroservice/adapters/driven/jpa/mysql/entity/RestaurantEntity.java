@@ -9,11 +9,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "restaurant")
 @Data
+@Getter
+@Setter
 public class RestaurantEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,11 +28,10 @@ public class RestaurantEntity {
     private String name;
     private String adress;
     private String phone;
-
     private String urlLogotype;
     @Column(unique = true)
     private String nit;
     @JoinColumn(name = "id_user")
-    private Long idOwner;
+    private String idOwner;
 
 }

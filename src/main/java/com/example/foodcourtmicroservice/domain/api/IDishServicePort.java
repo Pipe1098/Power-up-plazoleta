@@ -10,5 +10,5 @@ public interface IDishServicePort {
     void updateDish(Long id, String price, String description);
     void updateEnableDisableDish(Long dishId, Long enableDisable);
     List<Dish> findAllByRestaurantId(Long idRestaurante, Integer page, Integer size);
-    List<Dish> findAllByRestaurantIdAndCategory(Long idRestaurante, String category, Integer page, Integer size);
+    List<Dish> findAllByRestaurantIdAndCategory(Long idRestaurante, Long category, Integer page, Integer size);
 }

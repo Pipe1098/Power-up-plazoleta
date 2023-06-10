@@ -17,4 +17,5 @@ public interface IOrderResponseMapper {
     OrderResponseDto toResponse(OrderModel orderModel);
     List<OrderResponseDto> toResponseList(List<OrderModel> orderModels);
     List<OrderResponseDto> toOrderResponseList(List<OrderResponseModel> orderResponseModels);
+    List<OrderResponseModel> toResponseModelList(List<OrderModel> orderList);
 }

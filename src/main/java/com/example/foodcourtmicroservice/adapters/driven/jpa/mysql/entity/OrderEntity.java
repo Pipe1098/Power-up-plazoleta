@@ -15,7 +15,7 @@ import lombok.Setter;
 import java.util.Date;
 
 @Entity
-@Table(name = "pedidos")
+@Table(name = "orders")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
