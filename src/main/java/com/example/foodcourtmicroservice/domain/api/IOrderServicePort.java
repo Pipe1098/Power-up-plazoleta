@@ -13,4 +13,6 @@ public interface IOrderServicePort {
     List<OrderResponseModel> getAllOrdersWithPagination(Integer page, Integer size, String state);
 
     void takeOrderAndUpdateState(Long idOrder, String state);
+
+    void notifyOrderReady(Long idOrder);
 }

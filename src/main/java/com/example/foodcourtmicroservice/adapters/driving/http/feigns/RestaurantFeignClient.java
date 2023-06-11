@@ -5,6 +5,7 @@ import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.AuthR
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.JwtResponseDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.UserResponseDto;
 import com.example.foodcourtmicroservice.configuration.FeignClientConfig;
+import com.example.foodcourtmicroservice.domain.model.UserModel;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "user-microservice", url = "${external.usermicroservice.base-url}",configuration = FeignClientConfig.class)
 public interface RestaurantFeignClient {
 
-    @GetMapping("/user/validate-owner/{dni}")
+    @GetMapping("/api/v1/user/validate-owner/{dni}")
     Boolean validateOwner(@PathVariable("dniNumber") String dni);
 
     @PostMapping(value = "/auth/login")
@@ -30,4 +31,8 @@ public interface RestaurantFeignClient {
 
     @GetMapping(value = "/auth/idRestaurant/{token}")
     String idRestaurantUser(String token);
+
+    @GetMapping("/api/v1/user/{dniNumber}")
+    UserModel getUserById(String id);
 }
+

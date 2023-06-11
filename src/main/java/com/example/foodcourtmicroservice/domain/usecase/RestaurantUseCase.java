@@ -23,7 +23,7 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     @Override
     public void saveRestaurant(Restaurant restaurant) {
 
-       // String roleActual = userFeignClient.getRoleFromToken(Token.getToken());
+        String roleActual = userFeignClient.getRoleFromToken(Token.getToken());
         //ValidateAuthorization.validateRole(roleActual,Constants.ROLE_ADMIN);
 
        /* if(!userFeignClient.validateOwner(restaurant.getIdOwner())){

@@ -11,4 +11,5 @@ public interface IOrderHandler {
     void saveOrder(OrderRequestDto orderRequest);
     List<OrderResponseDto> getAllOrdersWithPagination(Integer page, Integer size, String state);
     void takeOrderAndUpdateState(Long idOrder, String state);
+    void NotifyOrderReady(Long idOrder);
 }

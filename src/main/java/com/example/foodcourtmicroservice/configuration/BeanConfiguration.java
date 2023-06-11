@@ -23,6 +23,7 @@ import com.example.foodcourtmicroservice.domain.api.IDishServicePort;
 import com.example.foodcourtmicroservice.domain.api.IOrderServicePort;
 import com.example.foodcourtmicroservice.domain.api.IRestaurantExternalServicePort;
 import com.example.foodcourtmicroservice.domain.api.IRestaurantServicePort;
+import com.example.foodcourtmicroservice.domain.api.ITwilioFeignClientPort;
 import com.example.foodcourtmicroservice.domain.spi.ICategoryPersistencePort;
 import com.example.foodcourtmicroservice.domain.spi.IDishPersistencePort;
 import com.example.foodcourtmicroservice.domain.spi.IOrderPersistencePort;
@@ -51,6 +52,7 @@ public class BeanConfiguration {
     private final IOrderDishRepository orderDishRepository;
     private final IOrderDishEntityMapper orderDishEntityMapper;
     private final IOrderResponseMapper orderResponseMapper;
+    private final ITwilioFeignClientPort twilioFeignClientPort;
 
 
     @Bean
@@ -85,7 +87,7 @@ public class BeanConfiguration {
 
     @Bean
     public IOrderServicePort orderServicePort(){
-        return new OrderUseCase(restaurantPersistencePort(),dishPersistencePort(),feignServicePort(), orderResponseMapper, orderPersistencePort());
+        return new OrderUseCase(restaurantPersistencePort(),dishPersistencePort(),feignServicePort(), orderResponseMapper, orderPersistencePort(), twilioFeignClientPort);
     }
     @Bean
     public IOrderPersistencePort orderPersistencePort(){
