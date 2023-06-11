@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,7 +56,25 @@ public class OrderRestController {
     public ResponseEntity<List<OrderResponseDto>> getAllOrderByState(@PathVariable Integer page, @PathVariable Integer size, @PathVariable(value = "estado") String state) {
         if (size <= 0L || page < 0L || state.isBlank() || state.isEmpty())
         {return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();}
-        //ResponseEntity.status(HttpStatus.OK).body(orderHandler.getAllOrdersWithPagination(page,size, estado));
+
         return ResponseEntity.ok(orderHandler.getAllOrdersWithPagination(page, size, state));
     }
+
+    @Operation(summary = "Take order and update state")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order taken", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Order doesn't exists", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content),
+            @ApiResponse(responseCode = "403", description = "No authorized", content = @Content)
+    })
+    @PutMapping("/takeOrderAndUpdateStatus/{idOrder}/status/{state}")
+    //@PreAuthorize("hasAuthority('EMPLOYEE_ROLE')")
+    public ResponseEntity<Void> takeOrderAndUpdateStatus(@PathVariable Long idOrder, @PathVariable String state) {
+        if (idOrder <= 0L || state.isBlank() || state.isEmpty())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        orderHandler.takeOrderAndUpdateState(idOrder, state);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
 }

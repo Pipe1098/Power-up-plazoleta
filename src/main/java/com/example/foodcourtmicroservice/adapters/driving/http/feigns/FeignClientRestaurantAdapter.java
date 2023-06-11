@@ -28,7 +28,10 @@ public class FeignClientRestaurantAdapter implements IRestaurantExternalServiceP
     public String getIdFromToken(String token) {
         return restaurantFeignClient.idUser(token);
     }
-
+    @Override
+    public String getIdRestaurantFromToken(String token) {
+        return restaurantFeignClient.idRestaurantUser(token);
+    }
     @Override
     public boolean existsUserById(Long idOwner) {
         return false;
@@ -43,4 +46,6 @@ public class FeignClientRestaurantAdapter implements IRestaurantExternalServiceP
     public UserModel getUserById(String idOwner) {
         return null;
     }
+
+
 }

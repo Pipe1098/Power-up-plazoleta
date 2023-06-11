@@ -62,10 +62,10 @@ public class DishUseCase implements IDishServicePort {
             throw new OwnerAnotherRestaurantException(Constants.DIFFERENT_OWNER);
         }
         if(price != null){
-            dish.setPrecio(price);
+            dish.setPrice(price);
         }
         if(description != null){
-            dish.setDescripcion(description);
+            dish.setDescription(description);
         }
         dishPersistencePort.updateDish(dish);
     }

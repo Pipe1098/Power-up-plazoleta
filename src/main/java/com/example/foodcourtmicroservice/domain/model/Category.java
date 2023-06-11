@@ -34,7 +34,7 @@ public class Category {
         return description;
     }
 
-    public void setDescripcion(String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 }
