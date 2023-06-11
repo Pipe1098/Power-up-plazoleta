@@ -5,11 +5,16 @@ import com.example.foodcourtmicroservice.adapters.driving.http.mappers.IOrderRes
 import com.example.foodcourtmicroservice.configuration.Constants;
 import com.example.foodcourtmicroservice.domain.api.IOrderServicePort;
 import com.example.foodcourtmicroservice.domain.api.IRestaurantExternalServicePort;
+import com.example.foodcourtmicroservice.domain.exception.ClientAuthMustBeEqualsClientOrderException;
 import com.example.foodcourtmicroservice.domain.exception.ClientHasAnOrderException;
 import com.example.foodcourtmicroservice.domain.exception.DishIdRestaurantIsNotEqualsOrderException;
 import com.example.foodcourtmicroservice.domain.exception.DishIsInactiveException;
 import com.example.foodcourtmicroservice.domain.exception.DishNotExistException;
+import com.example.foodcourtmicroservice.domain.exception.InvalidOrderStateException;
+import com.example.foodcourtmicroservice.domain.exception.InvalidPinException;
+import com.example.foodcourtmicroservice.domain.exception.NoCancelOrdersPreparationOrReadyException;
 import com.example.foodcourtmicroservice.domain.exception.NoDataFoundException;
+import com.example.foodcourtmicroservice.domain.exception.OnlyCancelOrderStatusPendingException;
 import com.example.foodcourtmicroservice.domain.exception.OrderNotExistException;
 import com.example.foodcourtmicroservice.domain.exception.OrderRestaurantMustBeEqualsEmployeeRestaurantException;
 import com.example.foodcourtmicroservice.domain.exception.RestaurantNoFoundException;
@@ -117,7 +122,7 @@ public class OrderUseCase implements IOrderServicePort {
         if (orderModel == null) {
             throw new OrderNotExistException(Constants.ORDER_NOT_EXIST);
         }
-        if (restaurantEmployee.getId() !=orderModel.getRestaurant().getId() ) {
+        if (restaurantEmployee.getId() != orderModel.getRestaurant().getId()) {
             throw new OrderRestaurantMustBeEqualsEmployeeRestaurantException(Constants.IDEMPLOYEE_IDORDER_DIFERENT);
         }
         orderModel.setState(state);
@@ -135,15 +140,11 @@ public class OrderUseCase implements IOrderServicePort {
 
         validateUserAuthentication();
 
-        Long idEmployeeAuth = parseLong(userFeignClientPort.getIdFromToken(Token.getToken()));
         Long idRestaurant = parseLong(userFeignClientPort.getIdRestaurantFromToken(Token.getToken()));
-        String role = userFeignClientPort.getRoleFromToken(Token.getToken());
-
-        Restaurant restaurantEmployee = getRestaurantById(idRestaurant);
 
         OrderModel orderModel = orderPersistencePort.getOrderById(idOrder);
         if (orderModel == null) {
-            throw new OrderNotExistException("Order does not exist.");
+            throw new OrderNotExistException(Constants.ORDER_NOT_EXIST);
         }
 
         Long idRestaurantOrder = orderModel.getRestaurant().getId();
@@ -166,6 +167,53 @@ public class OrderUseCase implements IOrderServicePort {
         SmsMessageModel smsMessageModel = new SmsMessageModel(phone, message);
 
         twilioFeignClientPort.sendSmsMessage(smsMessageModel);
+    }
+
+    @Override
+    public void deliverOrder(Long idOrder, String pin) {
+        OrderModel orderModel = orderPersistencePort.getOrderById(idOrder);
+        if (orderModel == null) {
+            throw new OrderNotExistException(Constants.ORDER_NOT_EXIST);
+        }
+
+        if (!orderModel.getState().equals(Constants.STATE_READY)) {
+            throw new InvalidOrderStateException("Only orders in 'READY' state can be delivered.");
+        }
+
+        if (!orderModel.getPin().equals(pin)) {
+            throw new InvalidPinException("Invalid pin entered.");
+        }
+
+        orderModel.setState(Constants.STATE_DELIVERED);
+        orderPersistencePort.saveOrder(orderModel);
+    }
+
+    @Override
+    public void cancelOrder(Long idOrder) {
+        validateUserAuthentication();
+        Long idClient = parseLong(userFeignClientPort.getIdFromToken(Token.getToken()));
+
+        OrderModel orderModel = orderPersistencePort.getOrderById(idOrder);
+        if (orderModel == null) {
+            throw new OrderNotExistException(Constants.ORDER_NOT_EXIST);
+        }
+        Long idClientOrder = orderModel.getIdClient();
+
+        if (!idClient.equals(idClientOrder)) {
+            throw new ClientAuthMustBeEqualsClientOrderException("The authenticated client has to be the same client of the order");
+        }
+
+        if (orderPersistencePort.existsByIdAndState(idOrder, Constants.STATE_IN_PREPARATION)
+                || orderPersistencePort.existsByIdAndState(idOrder, Constants.STATE_READY)) {
+            SmsMessageModel smsMessageModel = new SmsMessageModel("+573002217505", "Sorry, your order is already being prepared and cannot be cancelled.");
+            twilioFeignClientPort.sendSmsMessage(smsMessageModel);
+            throw new NoCancelOrdersPreparationOrReadyException("Orders with status IN_PREPARATION or READY cannot be canceled");
+        } else if (!orderPersistencePort.existsByIdAndState(idOrder, Constants.STATE_PENDING)) {
+            throw new OnlyCancelOrderStatusPendingException("Only Orders with status PENDING  can be canceled");
+        }
+
+        orderModel.setState(Constants.STATE_CANCELED);
+        orderPersistencePort.saveOrder(orderModel);
     }
 
     private String generatePin(UserModel userModel) {

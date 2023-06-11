@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(name = "message-microservice", url = "${external.messagemicroservice.base-url}",configuration = FeignClientConfig.class)
 public interface TwilioFeignClients {
-    @PostMapping("/")
+    @PostMapping("/api/v1/sms")
     ResponseEntity<Void> sendSmsMessage(@Valid @RequestBody SmsMessageRequestDto smsMessageRequestDto);
 }

@@ -4,6 +4,7 @@ package com.example.foodcourtmicroservice.adapters.driving.http.controller;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.OrderRequestDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.OrderResponseDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.handlers.IOrderHandler;
+import com.example.foodcourtmicroservice.configuration.Constants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,7 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -39,7 +41,7 @@ public class OrderRestController {
             @ApiResponse(responseCode = "403", description = "No authorized", content = @Content)
     })
     @PostMapping("/")
-    public ResponseEntity<OrderResponseDto> AddAnOrder(@Validated @RequestBody OrderRequestDto orderRequest) {
+    public ResponseEntity<OrderResponseDto> addAnOrder(@Validated @RequestBody OrderRequestDto orderRequest) {
         orderHandler.saveOrder(orderRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -81,11 +83,41 @@ public class OrderRestController {
             @ApiResponse(responseCode = "400", description = "Bad request", content = @Content),
             @ApiResponse(responseCode = "403", description = "No authorized", content = @Content)
     })
-    @PutMapping("/NotifyOrderReady/{idOrder}")
-    public ResponseEntity<Void> NotifyOrderReady(@PathVariable Long idOrder) {
+    @PutMapping("/notifyOrderReady/{idOrder}")
+    public ResponseEntity<Map<String,String>> notifyOrderReady(@PathVariable Long idOrder) {
         if (idOrder <= 0L) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        orderHandler.NotifyOrderReady(idOrder);
-        return new ResponseEntity<>(HttpStatus.OK);
+        orderHandler.notifyOrderReady(idOrder);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY,Constants.ORDER_READY));
     }
 
+    @Operation(summary = "Deliver order")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order deliver", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Order doesn't exists", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content),
+            @ApiResponse(responseCode = "403", description = "No authorized", content = @Content)
+    })
+    @PutMapping("/deliverOrder/{idOrder}/pin/{pin}")
+    public ResponseEntity<Map<String,String>> orderDeliver(@PathVariable Long idOrder, @PathVariable String pin) {
+        if (idOrder <= 0L) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        orderHandler.deliverOrder(idOrder, pin);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY,Constants.ORDER_DELIVERED));
+    }
+
+    @Operation(summary = "Cancel Order")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order cancel", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Order doesn't exists", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content),
+            @ApiResponse(responseCode = "403", description = "No authorized", content = @Content)
+    })
+    @PutMapping("/cancelOrder/{idOrder}")
+    public ResponseEntity<Map<String,String>> cancelOrder(@PathVariable Long idOrder){
+        if(idOrder <= 0L)  return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        orderHandler.cancelOrder(idOrder);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY,Constants.ORDER_CANCELED));
+    }
 }
