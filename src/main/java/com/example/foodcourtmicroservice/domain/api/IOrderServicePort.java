@@ -15,4 +15,6 @@ public interface IOrderServicePort {
     void takeOrderAndUpdateState(Long idOrder, String state);
 
     void notifyOrderReady(Long idOrder);
+
+    void deliverOrder(Long idOrder, String pin);
 }

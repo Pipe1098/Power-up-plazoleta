@@ -2,6 +2,7 @@ package com.example.foodcourtmicroservice.domain.model;
 
 
 
+import com.example.foodcourtmicroservice.domain.usecase.Token;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,4 +22,8 @@ public class OrderModel {
     private String state;
     private Long idEmployee;
     private Restaurant restaurant;
+
+    public String getPin() {
+        return Token.getPin();
+    }
 }

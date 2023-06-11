@@ -43,8 +43,13 @@ public class OrderHandlerImpl implements IOrderHandler {
     }
 
     @Override
-    public void NotifyOrderReady(Long idOrder) {
+    public void notifyOrderReady(Long idOrder) {
         orderServicePort.notifyOrderReady(idOrder);
+    }
+
+    @Override
+    public void deliverOrder(Long idOrder, String pin) {
+        orderServicePort.deliverOrder(idOrder,pin);
     }
 
 }

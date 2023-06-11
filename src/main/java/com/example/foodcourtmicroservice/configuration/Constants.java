@@ -32,10 +32,13 @@ public class Constants {
     public static final String STATE_PENDING = "PENDING";
     public static final String STATE_IN_PREPARATION = "IN_PREPARATION";
     public static final String STATE_READY = "READY";
+    public static final String STATE_DELIVERED = "DELIVERED";
     public static final String USER_NOT_AUTHENTICATED = "User not authenticated";
     public static final String CLIENT_HAS_AN_ORDER = "Client already has an order";
     public static final String UNAUTHORIZED_USER = "The user is not authorized to perform this request.";
     public static final String MODIFIED_DISH = "The dish has been modified.";
+    public static final String ORDER_READY = "The order is ready now";
+    public static final String ORDER_DELIVERED = "The order has been delivered";
     public static final String CREATED_DISH = "The dish has been created.";
     public static final String UNREGISTERED_DISH = "The dish you are trying to update is not registered.";
     public static final String USER_PERMISSION_DENIED = "User does not have appropriate permission.";

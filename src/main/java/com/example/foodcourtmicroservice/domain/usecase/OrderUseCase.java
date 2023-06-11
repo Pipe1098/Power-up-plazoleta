@@ -9,6 +9,8 @@ import com.example.foodcourtmicroservice.domain.exception.ClientHasAnOrderExcept
 import com.example.foodcourtmicroservice.domain.exception.DishIdRestaurantIsNotEqualsOrderException;
 import com.example.foodcourtmicroservice.domain.exception.DishIsInactiveException;
 import com.example.foodcourtmicroservice.domain.exception.DishNotExistException;
+import com.example.foodcourtmicroservice.domain.exception.InvalidOrderStateException;
+import com.example.foodcourtmicroservice.domain.exception.InvalidPinException;
 import com.example.foodcourtmicroservice.domain.exception.NoDataFoundException;
 import com.example.foodcourtmicroservice.domain.exception.OrderNotExistException;
 import com.example.foodcourtmicroservice.domain.exception.OrderRestaurantMustBeEqualsEmployeeRestaurantException;
@@ -143,7 +145,7 @@ public class OrderUseCase implements IOrderServicePort {
 
         OrderModel orderModel = orderPersistencePort.getOrderById(idOrder);
         if (orderModel == null) {
-            throw new OrderNotExistException("Order does not exist.");
+            throw new OrderNotExistException(Constants.ORDER_NOT_EXIST);
         }
 
         Long idRestaurantOrder = orderModel.getRestaurant().getId();
@@ -166,6 +168,25 @@ public class OrderUseCase implements IOrderServicePort {
         SmsMessageModel smsMessageModel = new SmsMessageModel(phone, message);
 
         twilioFeignClientPort.sendSmsMessage(smsMessageModel);
+    }
+
+    @Override
+    public void deliverOrder(Long idOrder, String pin) {
+        OrderModel orderModel = orderPersistencePort.getOrderById(idOrder);
+        if (orderModel == null) {
+            throw new OrderNotExistException(Constants.ORDER_NOT_EXIST);
+        }
+
+        if (!orderModel.getState().equals(Constants.STATE_READY)) {
+            throw new InvalidOrderStateException("Only orders in 'READY' state can be delivered.");
+        }
+
+        if (!orderModel.getPin().equals(pin)) {
+            throw new InvalidPinException("Invalid pin entered.");
+        }
+
+        orderModel.setState(Constants.STATE_DELIVERED);
+        orderPersistencePort.saveOrder(orderModel);
     }
 
     private String generatePin(UserModel userModel) {
