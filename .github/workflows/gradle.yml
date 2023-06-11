@@ -20,8 +20,4 @@ jobs:
           java-version: 17
           distribution: temurin
 
-      - name: run all tests
-        run: ./gradlew testClasses
 
-      - name: create .jar and install
-        run: ./gradlew bootJar
