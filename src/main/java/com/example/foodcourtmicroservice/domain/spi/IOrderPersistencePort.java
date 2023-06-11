@@ -1,10 +1,11 @@
 package com.example.foodcourtmicroservice.domain.spi;
 
 
+
 import com.example.foodcourtmicroservice.domain.model.OrderDishModel;
 import com.example.foodcourtmicroservice.domain.model.OrderModel;
-
 import java.util.List;
+
 
 public interface IOrderPersistencePort {
     OrderModel saveOrder(OrderModel orderModel);
@@ -13,4 +14,7 @@ public interface IOrderPersistencePort {
 
     Boolean existsByIdClientAndState(Long id, String estado);
 
+    Boolean existsByIdAndState(Long idOrder, String pendiente);
+
+    OrderModel getOrderById(Long id);
 }

@@ -50,19 +50,19 @@ public class Dish {
         this.idCategory = idCategory;
     }
 
-    public String getDescripcion() {
+    public String getDescription() {
         return description;
     }
 
-    public void setDescripcion(String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
-    public String getPrecio() {
+    public String getPrice() {
         return price;
     }
 
-    public void setPrecio(String price) {
+    public void setPrice(String price) {
         this.price = price;
     }
 

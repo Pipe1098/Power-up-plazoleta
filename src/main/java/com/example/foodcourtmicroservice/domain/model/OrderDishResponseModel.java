@@ -12,11 +12,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class OrderDishResponseModel {
     private Long id;
-    private String nombre;
-    private String precio;
-    private String descripcion;
-    private String urlImagen;
-    private Category categoriaId;
+    private String name;
+    private String price;
+    private String description;
+    private String urlImage;
+    private Category categoryId;
 
-    private String cantidad;
+    private String amount;
 }

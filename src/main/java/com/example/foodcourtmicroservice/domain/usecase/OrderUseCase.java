@@ -1,6 +1,5 @@
 package com.example.foodcourtmicroservice.domain.usecase;
 
-import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.OrderResponseDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.mappers.IOrderResponseMapper;
 import com.example.foodcourtmicroservice.configuration.Constants;
 import com.example.foodcourtmicroservice.domain.api.IOrderServicePort;
@@ -10,6 +9,8 @@ import com.example.foodcourtmicroservice.domain.exception.DishIdRestaurantIsNotE
 import com.example.foodcourtmicroservice.domain.exception.DishIsInactiveException;
 import com.example.foodcourtmicroservice.domain.exception.DishNotExistException;
 import com.example.foodcourtmicroservice.domain.exception.NoDataFoundException;
+import com.example.foodcourtmicroservice.domain.exception.OrderNotExistException;
+import com.example.foodcourtmicroservice.domain.exception.OrderRestaurantMustBeEqualsEmployeeRestaurantException;
 import com.example.foodcourtmicroservice.domain.exception.RestaurantNoFoundException;
 import com.example.foodcourtmicroservice.domain.exception.UserNotAuthenticatedException;
 import com.example.foodcourtmicroservice.domain.model.Dish;
@@ -49,26 +50,27 @@ public class OrderUseCase implements IOrderServicePort {
     }
 
 
-@Override
-public void saveOrder(OrderRequestModel orderRequestModel) {
+    @Override
+    public void saveOrder(OrderRequestModel orderRequestModel) {
 
-     validateUserAuthentication();
+        validateUserAuthentication();
 
-    Long idClient = parseLong(userFeignClientPort.getIdFromToken(Token.getToken()));
+        Long idClient = parseLong(userFeignClientPort.getIdFromToken(Token.getToken()));
 
-    validateClientOrderStatus(idClient);
+        validateClientOrderStatus(idClient);
 
-    Restaurant restaurant = getRestaurantById(orderRequestModel.getResturantId());
+        Restaurant restaurant = getRestaurantById(orderRequestModel.getResturantId());
 
-    List<OrderDishRequestModel> orderDishes = orderRequestModel.getDishes();
-    validateOrderDishes(orderDishes);
+        List<OrderDishRequestModel> orderDishes = orderRequestModel.getDishes();
+        validateOrderDishes(orderDishes);
 
-    OrderModel orderModel = createOrderModel(idClient, restaurant);
-    validateDishes(orderDishes, orderModel.getRestaurant());
+        OrderModel orderModel = createOrderModel(idClient, restaurant);
+        validateDishes(orderDishes, orderModel.getRestaurant());
 
-    OrderModel order = saveOrder(orderModel);
-    saveOrderDishes(order, orderDishes);
-}
+        OrderModel order = saveOrder(orderModel);
+        saveOrderDishes(order, orderDishes);
+    }
+
     @Override
     public List<OrderResponseModel> getAllOrdersWithPagination(Integer page, Integer size, String state) {
         Pageable pageable = PageRequest.of(page, size);
@@ -83,6 +85,40 @@ public void saveOrder(OrderRequestModel orderRequestModel) {
         return orderResponseMapper.toResponseModelList(orderList);
     }
 
+    @Override
+    public void takeOrderAndUpdateState(Long idOrder, String state) {
+        validateUserAuthentication();
+
+        Long idEmployee = parseLong(userFeignClientPort.getIdFromToken(Token.getToken()));
+        Long idRestaurant = parseLong(userFeignClientPort.getIdRestaurantFromToken(Token.getToken()));
+        String role = userFeignClientPort.getRoleFromToken(Token.getToken());
+
+        Restaurant restaurantEmployee = getRestaurantById(idRestaurant);
+
+        if (!role.equals(Constants.EMPLOYEE_ROLE)) {
+            throw new UserNotAuthenticatedException(Constants.UNAUTHORIZED_USER);
+        }
+
+        if (!state.equals(Constants.STATE_IN_PREPARATION)) {
+            throw new NoDataFoundException(Constants.STATE_NOT_VALID);
+        }
+        if (Boolean.FALSE.equals(orderPersistencePort.existsByIdAndState(idOrder, Constants.STATE_PENDING))) {
+            throw new NoDataFoundException(Constants.ACTUAL_STATE_NOT_VALID);
+        }
+
+        OrderModel orderModel = orderPersistencePort.getOrderById(idOrder);
+        if (orderModel == null) {
+            throw new OrderNotExistException(Constants.ORDER_NOT_EXIST);
+        }
+        if (restaurantEmployee.getId() !=orderModel.getRestaurant().getId() ) {
+            throw new OrderRestaurantMustBeEqualsEmployeeRestaurantException(Constants.IDEMPLOYEE_IDORDER_DIFERENT);
+        }
+        orderModel.setState(state);
+        orderModel.setIdEmployee(idEmployee);
+
+        orderPersistencePort.saveOrder(orderModel);
+    }
+
     private void validateUserAuthentication() {
         if (Token.getToken() == null) {
             throw new UserNotAuthenticatedException(Constants.USER_NOT_AUTHENTICATED);
@@ -91,7 +127,7 @@ public void saveOrder(OrderRequestModel orderRequestModel) {
 
     private void validateClientOrderStatus(Long idClient) {
         List<String> states = List.of(Constants.STATE_PENDING, Constants.STATE_IN_PREPARATION, Constants.STATE_READY);
-        if (orderPersistencePort.existsByIdClientAndState(idClient, states.get(0))||
+        if (orderPersistencePort.existsByIdClientAndState(idClient, states.get(0)) ||
                 orderPersistencePort.existsByIdClientAndState(idClient, states.get(1)) ||
                 orderPersistencePort.existsByIdClientAndState(idClient, states.get(2))) {
             throw new ClientHasAnOrderException(Constants.CLIENT_HAS_AN_ORDER);

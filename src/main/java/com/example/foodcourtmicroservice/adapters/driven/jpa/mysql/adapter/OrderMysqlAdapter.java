@@ -13,6 +13,7 @@ import com.example.foodcourtmicroservice.domain.spi.IOrderPersistencePort;
 import lombok.RequiredArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @RequiredArgsConstructor
@@ -45,6 +46,18 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
     @Override
     public Boolean existsByIdClientAndState(Long id, String estado) {
         return orderRepository.existsByIdClientAndState(id, estado);
+    }
+
+    @Override
+    public Boolean existsByIdAndState(Long idOrder, String pendiente) {
+        return orderRepository.existsByIdAndState(idOrder, pendiente);
+    }
+
+    @Override
+    public OrderModel getOrderById(Long id) {
+        Optional<OrderEntity> orderEntityOptional =orderRepository.findById(id);
+        OrderEntity orderEntity= orderEntityOptional.orElse(null);
+        return orderEntityMapper.toOrderModel(orderEntity);
     }
 
 }
