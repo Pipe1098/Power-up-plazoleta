@@ -39,7 +39,6 @@ public class OrderRestController {
             @ApiResponse(responseCode = "403", description = "No authorized", content = @Content)
     })
     @PostMapping("/")
-   // @PreAuthorize("hasAuthority('CLIENT_ROLE')")
     public ResponseEntity<OrderResponseDto> AddAnOrder(@Validated @RequestBody OrderRequestDto orderRequest) {
         orderHandler.saveOrder(orderRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -68,7 +67,6 @@ public class OrderRestController {
             @ApiResponse(responseCode = "403", description = "No authorized", content = @Content)
     })
     @PutMapping("/takeOrderAndUpdateStatus/{idOrder}/status/{state}")
-    //@PreAuthorize("hasAuthority('EMPLOYEE_ROLE')")
     public ResponseEntity<Void> takeOrderAndUpdateStatus(@PathVariable Long idOrder, @PathVariable String state) {
         if (idOrder <= 0L || state.isBlank() || state.isEmpty())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -76,5 +74,18 @@ public class OrderRestController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @Operation(summary = "Notify that Order is ready")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order ready", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Order doesn't exists", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content),
+            @ApiResponse(responseCode = "403", description = "No authorized", content = @Content)
+    })
+    @PutMapping("/NotifyOrderReady/{idOrder}")
+    public ResponseEntity<Void> NotifyOrderReady(@PathVariable Long idOrder) {
+        if (idOrder <= 0L) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        orderHandler.NotifyOrderReady(idOrder);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 }

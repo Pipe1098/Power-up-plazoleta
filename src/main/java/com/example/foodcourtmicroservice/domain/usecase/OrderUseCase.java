@@ -1,5 +1,6 @@
 package com.example.foodcourtmicroservice.domain.usecase;
 
+import com.example.foodcourtmicroservice.domain.api.ITwilioFeignClientPort;
 import com.example.foodcourtmicroservice.adapters.driving.http.mappers.IOrderResponseMapper;
 import com.example.foodcourtmicroservice.configuration.Constants;
 import com.example.foodcourtmicroservice.domain.api.IOrderServicePort;
@@ -20,6 +21,8 @@ import com.example.foodcourtmicroservice.domain.model.OrderModel;
 import com.example.foodcourtmicroservice.domain.model.OrderRequestModel;
 import com.example.foodcourtmicroservice.domain.model.OrderResponseModel;
 import com.example.foodcourtmicroservice.domain.model.Restaurant;
+import com.example.foodcourtmicroservice.domain.model.SmsMessageModel;
+import com.example.foodcourtmicroservice.domain.model.UserModel;
 import com.example.foodcourtmicroservice.domain.spi.IDishPersistencePort;
 import com.example.foodcourtmicroservice.domain.spi.IOrderPersistencePort;
 import com.example.foodcourtmicroservice.domain.spi.IRestaurantPersistencePort;
@@ -30,6 +33,8 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
 import static java.lang.Long.parseLong;
 
 
@@ -40,13 +45,15 @@ public class OrderUseCase implements IOrderServicePort {
     private final IRestaurantExternalServicePort userFeignClientPort;
     private final IOrderResponseMapper orderResponseMapper;
     private final IOrderPersistencePort orderPersistencePort;
+    private final ITwilioFeignClientPort twilioFeignClientPort;
 
-    public OrderUseCase(IRestaurantPersistencePort restaurantPersistencePort, IDishPersistencePort dishPersistencePort, IRestaurantExternalServicePort userFeignClientPort, IOrderResponseMapper orderResponseMapper, IOrderPersistencePort orderPersistencePort) {
+    public OrderUseCase(IRestaurantPersistencePort restaurantPersistencePort, IDishPersistencePort dishPersistencePort, IRestaurantExternalServicePort userFeignClientPort, IOrderResponseMapper orderResponseMapper, IOrderPersistencePort orderPersistencePort, ITwilioFeignClientPort twilioFeignClientPort) {
         this.restaurantPersistencePort = restaurantPersistencePort;
         this.dishPersistencePort = dishPersistencePort;
         this.userFeignClientPort = userFeignClientPort;
         this.orderResponseMapper = orderResponseMapper;
         this.orderPersistencePort = orderPersistencePort;
+        this.twilioFeignClientPort = twilioFeignClientPort;
     }
 
 
@@ -117,6 +124,69 @@ public class OrderUseCase implements IOrderServicePort {
         orderModel.setIdEmployee(idEmployee);
 
         orderPersistencePort.saveOrder(orderModel);
+    }
+
+    @Override
+    public void notifyOrderReady(Long idOrder) {
+
+        if (!orderPersistencePort.existsByIdAndState(idOrder, Constants.STATE_IN_PREPARATION)) {
+            throw new NoDataFoundException("Order not found or not in preparation state.");
+        }
+
+        validateUserAuthentication();
+
+        Long idEmployeeAuth = parseLong(userFeignClientPort.getIdFromToken(Token.getToken()));
+        Long idRestaurant = parseLong(userFeignClientPort.getIdRestaurantFromToken(Token.getToken()));
+        String role = userFeignClientPort.getRoleFromToken(Token.getToken());
+
+        Restaurant restaurantEmployee = getRestaurantById(idRestaurant);
+
+        OrderModel orderModel = orderPersistencePort.getOrderById(idOrder);
+        if (orderModel == null) {
+            throw new OrderNotExistException("Order does not exist.");
+        }
+
+        Long idRestaurantOrder = orderModel.getRestaurant().getId();
+
+        if (!idRestaurant.equals(idRestaurantOrder)) {
+            throw new OrderRestaurantMustBeEqualsEmployeeRestaurantException("Order restaurant must be equal to employee restaurant.");
+        }
+
+        orderModel.setState(Constants.STATE_READY);
+        orderPersistencePort.saveOrder(orderModel);
+
+        UserModel userModel = userFeignClientPort.getUserById(orderModel.getIdClient().toString());
+        String ClientName = userModel.getName();
+        String pin = generatePin(userModel);
+
+
+        String message = "Good day, Mr./Ms. " + ClientName + ", your order is now ready for pickup.\nRemember to show the following PIN " + pin + " to receive your order.";
+        String phone = "+573002217505";
+
+        SmsMessageModel smsMessageModel = new SmsMessageModel(phone, message);
+
+        twilioFeignClientPort.sendSmsMessage(smsMessageModel);
+    }
+
+    private String generatePin(UserModel userModel) {
+
+        String alphanumericCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        int pinLength = 6; // Longitud del PIN deseada
+
+        StringBuilder pinBuilder = new StringBuilder();
+        Random random = new Random();
+
+        // Generar caracteres aleatorios hasta alcanzar la longitud del PIN
+        for (int i = 0; i < pinLength; i++) {
+            int randomIndex = random.nextInt(alphanumericCharacters.length());
+            char randomChar = alphanumericCharacters.charAt(randomIndex);
+            pinBuilder.append(randomChar);
+        }
+
+        String pin = pinBuilder.toString();
+        userModel.setPin(pin);
+
+        return pin;
     }
 
     private void validateUserAuthentication() {

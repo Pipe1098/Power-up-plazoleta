@@ -42,4 +42,9 @@ public class OrderHandlerImpl implements IOrderHandler {
         orderServicePort.takeOrderAndUpdateState(idOrder,state);
     }
 
+    @Override
+    public void NotifyOrderReady(Long idOrder) {
+        orderServicePort.notifyOrderReady(idOrder);
+    }
+
 }
