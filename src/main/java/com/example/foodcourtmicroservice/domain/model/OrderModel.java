@@ -26,4 +26,8 @@ public class OrderModel {
     public String getPin() {
         return Token.getPin();
     }
+
+    public void setPin(String pin) {
+        Token.setPin(pin);
+    }
 }

@@ -24,11 +24,11 @@ public class RestaurantUseCase implements IRestaurantServicePort {
     public void saveRestaurant(Restaurant restaurant) {
 
         String roleActual = userFeignClient.getRoleFromToken(Token.getToken());
-        //ValidateAuthorization.validateRole(roleActual,Constants.ROLE_ADMIN);
+        ValidateAuthorization.validateRole(roleActual,Constants.ROLE_ADMIN);
 
-       /* if(!userFeignClient.validateOwner(restaurant.getIdOwner())){
+        if(!userFeignClient.validateOwner(restaurant.getIdOwner())){
             throw new UserMustBeOwnerException(Constants.USER_PERMISSION_DENIED);
-        }*/
+        }
 
         this.restaurantPersistencePort.saveRestaurant(restaurant);
     }

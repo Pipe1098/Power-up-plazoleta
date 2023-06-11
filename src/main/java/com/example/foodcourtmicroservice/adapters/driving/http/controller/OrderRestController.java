@@ -106,5 +106,18 @@ public class OrderRestController {
                 Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY,Constants.ORDER_DELIVERED));
     }
 
-
+    @Operation(summary = "Cancel Order")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Order cancel", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Order doesn't exists", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad request", content = @Content),
+            @ApiResponse(responseCode = "403", description = "No authorized", content = @Content)
+    })
+    @PutMapping("/cancelOrder/{idOrder}")
+    public ResponseEntity<Map<String,String>> cancelOrder(@PathVariable Long idOrder){
+        if(idOrder <= 0L)  return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        orderHandler.cancelOrder(idOrder);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                Collections.singletonMap(Constants.RESPONSE_MESSAGE_KEY,Constants.ORDER_CANCELED));
+    }
 }

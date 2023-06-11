@@ -3,6 +3,8 @@ package com.example.foodcourtmicroservice.domainTest;
 import com.example.foodcourtmicroservice.adapters.driving.http.mappers.IOrderResponseMapper;
 import com.example.foodcourtmicroservice.configuration.Constants;
 import com.example.foodcourtmicroservice.domain.api.IRestaurantExternalServicePort;
+import com.example.foodcourtmicroservice.domain.api.ITwilioFeignClientPort;
+import com.example.foodcourtmicroservice.domain.exception.InvalidPinException;
 import com.example.foodcourtmicroservice.domain.model.Dish;
 import com.example.foodcourtmicroservice.domain.model.OrderDishModel;
 import com.example.foodcourtmicroservice.domain.model.OrderDishRequestModel;
@@ -11,11 +13,14 @@ import com.example.foodcourtmicroservice.domain.model.OrderModel;
 import com.example.foodcourtmicroservice.domain.model.OrderRequestModel;
 import com.example.foodcourtmicroservice.domain.model.OrderResponseModel;
 import com.example.foodcourtmicroservice.domain.model.Restaurant;
+import com.example.foodcourtmicroservice.domain.model.SmsMessageModel;
+import com.example.foodcourtmicroservice.domain.model.UserModel;
 import com.example.foodcourtmicroservice.domain.spi.IDishPersistencePort;
 import com.example.foodcourtmicroservice.domain.spi.IOrderPersistencePort;
 import com.example.foodcourtmicroservice.domain.spi.IRestaurantPersistencePort;
 import com.example.foodcourtmicroservice.domain.usecase.OrderUseCase;
 import com.example.foodcourtmicroservice.domain.usecase.Token;
+import org.hibernate.boot.model.source.spi.PluralAttributeIndexSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -29,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class OrderUseCaseTest {
@@ -43,6 +49,8 @@ class OrderUseCaseTest {
     @Mock
     private IOrderResponseMapper orderResponseMapper;
     private OrderUseCase orderUseCase;
+    @Mock
+    private ITwilioFeignClientPort twilioFeignClientPort;
 
 
     @BeforeEach
@@ -59,10 +67,8 @@ class OrderUseCaseTest {
         Restaurant restaurant = createRestaurant();
         Dish dish = createDish();
         List<OrderDishRequestModel> orderDishes = createOrderDishes();
-        // Token token = mock(Token.class);
         Dish dishMock = mock(Dish.class);
 
-// Configurar el comportamiento del método getIdRestaurant()
         when(dishMock.getIdRestaurant()).thenReturn(restaurant);
         when(userFeignClientPort.getIdFromToken(Token.getToken())).thenReturn(String.valueOf(idClient));
         when(restaurantPersistencePort.getRestaurant(orderRequestModel.getResturantId())).thenReturn(restaurant);
@@ -134,6 +140,106 @@ class OrderUseCaseTest {
         verify(orderPersistencePort, times(1)).saveOrder(orderModel);
     }
 
+    @Test
+    void notifyOrderReady_OrderExists_UpdateOrderStatusAndSendNotification() {
+        // Arrange
+        Long idOrder = 1L;
+        String state = Constants.STATE_IN_PREPARATION;
+        Long idEmployee = 2L;
+        Long idRestaurant = 3L;
+        Token.setToken("valid_token");
+        OrderModel orderModel = createOrderModel(idOrder, idRestaurant);
+        UserModel userModel = new UserModel("sdsd", "gsg", "dsfsdf", "3002569874", "123456897", LocalDate.now());
+
+        when(userFeignClientPort.getIdFromToken(Token.getToken())).thenReturn(String.valueOf(idEmployee));
+        when(orderPersistencePort.existsByIdAndState(idOrder, Constants.STATE_IN_PREPARATION)).thenReturn(true);
+        when(userFeignClientPort.getIdRestaurantFromToken(Token.getToken())).thenReturn(String.valueOf(idRestaurant));
+        when(orderPersistencePort.getOrderById(idOrder)).thenReturn(orderModel);
+        when(userFeignClientPort.getUserById(any())).thenReturn(userModel);
+        orderModel.setId(idOrder);
+        orderModel.setState("READY");
+        String message = "Good day, Mr./Ms." + "your order is now ready for pickup.\nRemember to show the following PIN " + 123456 + " to receive your order.";
+        String phone = "+573002217505";
+        SmsMessageModel smsMessageModel = new SmsMessageModel(phone, message);
+
+        // Act
+        orderUseCase.notifyOrderReady(idOrder);
+
+        // Assert
+        verify(orderPersistencePort, times(1)).getOrderById(idOrder);
+        verify(orderPersistencePort, times(1)).saveOrder(orderModel);
+        verify(twilioFeignClientPort, times(1)).sendSmsMessage(smsMessageModel);
+    }
+
+    @Test
+    void deliverOrder_ValidOrderAndPin_OrderDeliveredSuccessfully() {
+        // Arrange
+        Long idOrder = 1L;
+        String pin = "1234";
+        OrderModel orderModel = new OrderModel();
+        orderModel.setId(idOrder);
+        orderModel.setState(Constants.STATE_READY);
+        orderModel.setPin(pin);
+
+        when(orderPersistencePort.getOrderById(idOrder)).thenReturn(orderModel);
+
+        // Act
+        orderUseCase.deliverOrder(idOrder, pin);
+
+        // Assert
+        assertEquals(Constants.STATE_DELIVERED, orderModel.getState());
+        verify(orderPersistencePort, times(1)).saveOrder(orderModel);
+    }
+
+    @Test
+    void deliverOrder_InvalidPin_ExceptionThrown() {
+        // Arrange
+        Long idOrder = 1L;
+        String pin = "1234";
+        OrderModel orderModel = new OrderModel();
+        orderModel.setId(idOrder);
+        orderModel.setState(Constants.STATE_READY);
+        orderModel.setPin("5678");
+
+        when(orderPersistencePort.getOrderById(idOrder)).thenReturn(orderModel);
+
+        // Act & Assert
+        assertThrows(InvalidPinException.class, () -> orderUseCase.deliverOrder(idOrder, pin));
+        verify(orderPersistencePort, never()).saveOrder(any(OrderModel.class));
+    }
+
+    @Test
+    void cancelOrder_ValidIdOrder_CancelsOrderSuccessfully() {
+        // Arrange
+        Long idOrder = 1L;
+        String token = "valid_token";
+        Token.setToken("valid_token");
+        Long idClient = 1L;
+        OrderModel orderModel = new OrderModel();
+        orderModel.setId(idOrder);
+        orderModel.setState(Constants.STATE_PENDING);
+        orderModel.setIdClient(idClient);
+
+        when(userFeignClientPort.getIdFromToken(token)).thenReturn(String.valueOf(idClient));
+        when(orderPersistencePort.getOrderById(idOrder)).thenReturn(orderModel);
+        when(orderPersistencePort.existsByIdAndState(idOrder, Constants.STATE_IN_PREPARATION)).thenReturn(false);
+        when(orderPersistencePort.existsByIdAndState(idOrder, Constants.STATE_READY)).thenReturn(false);
+        when(orderPersistencePort.existsByIdAndState(idOrder, Constants.STATE_PENDING)).thenReturn(true);
+        when(orderPersistencePort.saveOrder(orderModel)).thenReturn(orderModel);
+
+        // Act
+        orderUseCase.cancelOrder(idOrder);
+
+        // Assert
+        verify(userFeignClientPort).getIdFromToken(token);
+        verify(orderPersistencePort).getOrderById(idOrder);
+        verify(orderPersistencePort).existsByIdAndState(idOrder, Constants.STATE_IN_PREPARATION);
+        verify(orderPersistencePort).existsByIdAndState(idOrder, Constants.STATE_READY);
+        verify(orderPersistencePort).existsByIdAndState(idOrder, Constants.STATE_PENDING);
+        verify(orderPersistencePort).saveOrder(orderModel);
+        assertEquals(Constants.STATE_CANCELED, orderModel.getState());
+    }
+
     private Restaurant createRestaurant(Long id) {
         Restaurant restaurant = new Restaurant();
         restaurant.setId(id);
@@ -148,7 +254,6 @@ class OrderUseCaseTest {
         orderModel.setRestaurant(restaurant);
         return orderModel;
     }
-
 
     private List<OrderModel> createOrderModelList() {
         List<OrderModel> orderModels = new ArrayList<>();
@@ -170,7 +275,6 @@ class OrderUseCaseTest {
         orderModel2.setIdEmployee(2L);
         orderModel2.setRestaurant(createRestaurant(2L));
         orderModels.add(orderModel2);
-
 
         return orderModels;
     }
@@ -196,7 +300,6 @@ class OrderUseCaseTest {
             orderDishResponseModel.setUrlImage(orderDishModel.getDish().getUrlImage());
             orderDishResponseModel.setCategoryId(orderDishModel.getDish().getIdCategory());
             orderDishResponseModel.setAmount(orderDishModel.getAmount());
-            // Set other properties of OrderDishResponseModel if needed
             orderDishResponseModels.add(orderDishResponseModel);
         }
 
@@ -223,7 +326,6 @@ class OrderUseCaseTest {
         restaurant.setId(1L);
         restaurant.setName("Restaurant Test");
 
-
         return restaurant;
     }
 
@@ -240,7 +342,6 @@ class OrderUseCaseTest {
         orderDish2.setNumberDishes(1l);
         orderDishes.add(orderDish2);
 
-
         return orderDishes;
     }
 
@@ -249,8 +350,6 @@ class OrderUseCaseTest {
         dish.setId(1L);
         dish.setname("Dish Test");
         dish.setIdRestaurant(createRestaurant());
-
-
         return dish;
     }
 }
