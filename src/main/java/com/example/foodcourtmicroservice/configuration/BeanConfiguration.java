@@ -5,6 +5,9 @@ import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.adapter.Categ
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.adapter.DishMysqlAdapter;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.adapter.OrderMysqlAdapter;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.adapter.RestaurantMysqlAdapter;
+import com.example.foodcourtmicroservice.adapters.driving.http.feigns.TrazabilityFeignAdapter;
+import com.example.foodcourtmicroservice.adapters.driving.http.feigns.TrazabilityFeignClient;
+import com.example.foodcourtmicroservice.adapters.driving.http.feigns.TwilioFeignAdapter;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.ICategoryEntityMapper;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.IDishEntityMapper;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.IOrderDishEntityMapper;
@@ -17,12 +20,17 @@ import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.repositories.
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.repositories.IRestaurantRepository;
 import com.example.foodcourtmicroservice.adapters.driving.http.feigns.FeignClientRestaurantAdapter;
 import com.example.foodcourtmicroservice.adapters.driving.http.feigns.RestaurantFeignClient;
+import com.example.foodcourtmicroservice.adapters.driving.http.feigns.TwilioFeignClients;
 import com.example.foodcourtmicroservice.adapters.driving.http.mappers.IOrderResponseMapper;
+import com.example.foodcourtmicroservice.adapters.driving.http.mappers.ITrazabilityMapper;
+import com.example.foodcourtmicroservice.adapters.driving.http.mappers.ITwilioMapper;
 import com.example.foodcourtmicroservice.domain.api.IAuthServicePort;
 import com.example.foodcourtmicroservice.domain.api.IDishServicePort;
 import com.example.foodcourtmicroservice.domain.api.IOrderServicePort;
 import com.example.foodcourtmicroservice.domain.api.IRestaurantExternalServicePort;
 import com.example.foodcourtmicroservice.domain.api.IRestaurantServicePort;
+import com.example.foodcourtmicroservice.domain.api.ITwilioFeignServicePort;
+import com.example.foodcourtmicroservice.domain.api.TrazabilityFeignServicePort;
 import com.example.foodcourtmicroservice.domain.spi.ICategoryPersistencePort;
 import com.example.foodcourtmicroservice.domain.spi.IDishPersistencePort;
 import com.example.foodcourtmicroservice.domain.spi.IOrderPersistencePort;
@@ -51,6 +59,10 @@ public class BeanConfiguration {
     private final IOrderDishRepository orderDishRepository;
     private final IOrderDishEntityMapper orderDishEntityMapper;
     private final IOrderResponseMapper orderResponseMapper;
+    private final TwilioFeignClients twilioFeignClients;
+    private final ITwilioMapper twilioMapper;
+    private final TrazabilityFeignClient trazabilityFeignClient;
+    private final ITrazabilityMapper trazabilityMapper;
 
 
     @Bean
@@ -70,6 +82,7 @@ public class BeanConfiguration {
     public IRestaurantPersistencePort restaurantPersistencePort(){
         return new RestaurantMysqlAdapter(restaurantRepository,restaurantEntityMapper);
     }
+
     @Bean
     public IDishServicePort dishServicePort(){
         return new DishUseCase(dishPersistencePort(),restaurantPersistencePort(),categoryPersistencePort(),feignServicePort());
@@ -85,10 +98,21 @@ public class BeanConfiguration {
 
     @Bean
     public IOrderServicePort orderServicePort(){
-        return new OrderUseCase(restaurantPersistencePort(),dishPersistencePort(),feignServicePort(), orderResponseMapper, orderPersistencePort());
+        return new OrderUseCase(restaurantPersistencePort(),dishPersistencePort(),feignServicePort(), orderResponseMapper, orderPersistencePort(),  twilioFeignServicePort(), trazabilityFeignServicePort());
     }
     @Bean
     public IOrderPersistencePort orderPersistencePort(){
         return new OrderMysqlAdapter(orderRepository,orderEntityMapper,orderDishRepository,orderDishEntityMapper);
     }
+
+    @Bean
+    public  ITwilioFeignServicePort twilioFeignServicePort(){
+        return new TwilioFeignAdapter(twilioFeignClients, twilioMapper);
+    }
+    @Bean
+    public TrazabilityFeignServicePort trazabilityFeignServicePort(){
+        return new TrazabilityFeignAdapter(trazabilityFeignClient, trazabilityMapper);
+    }
+
+
 }

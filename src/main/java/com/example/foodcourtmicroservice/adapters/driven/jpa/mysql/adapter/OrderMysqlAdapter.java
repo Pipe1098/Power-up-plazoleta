@@ -47,4 +47,14 @@ public class OrderMysqlAdapter implements IOrderPersistencePort {
         return orderRepository.existsByIdClientAndState(id, estado);
     }
 
+    @Override
+    public Boolean existsByIdAndState(Long idOrder, String statePending) {
+        return  orderRepository.existsByIdAndState(idOrder, statePending);
+    }
+
+    @Override
+    public OrderModel getOrderById(Long idOrder) {
+        return orderEntityMapper.toOrderModel(orderRepository.findById(idOrder).get());
+    }
+
 }

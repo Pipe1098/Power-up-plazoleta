@@ -21,5 +21,5 @@ public class DishEntity {
     @OneToOne
     private RestaurantEntity idRestaurant;
     private String urlImage;
-    private Boolean active;
+    private boolean active;
 }

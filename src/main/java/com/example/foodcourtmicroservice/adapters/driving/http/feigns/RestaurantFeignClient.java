@@ -28,5 +28,7 @@ public interface RestaurantFeignClient {
     @GetMapping(value = "/auth/role/{token}")
     String roleUser(@PathVariable("token") String token);
 
+    @GetMapping(value = "/auth/idRestaurant/{token}")
+    String idRestaurantUser(String token);
 
 }

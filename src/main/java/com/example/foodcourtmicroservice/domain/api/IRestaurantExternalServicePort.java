@@ -9,4 +9,6 @@ public interface IRestaurantExternalServicePort {
     boolean existsUserById(Long idOwner);
     boolean validateOwner(String idOwner);
     UserModel getUserById(String idOwner);
+
+    String getIdRestaurantFromToken(String token);
 }

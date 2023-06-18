@@ -1,5 +1,6 @@
 package com.example.foodcourtmicroservice.domain.model;
 
+import com.example.foodcourtmicroservice.domain.usecase.Token;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,4 +19,8 @@ public class UserModel {
     private String email;
     private String password;
     private RoleModel role;
+
+    public void setPin(String pin) {
+        Token.setPin(pin);
+    }
 }

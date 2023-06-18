@@ -20,4 +20,5 @@ management:
         include: "*"
 
 external.usermicroservice.base-url: http://localhost:8090
-
+external.messagemicroservice.base-url: http://localhost:8092
+external.trazabilitymicroservice.base-url: http://localhost:8080

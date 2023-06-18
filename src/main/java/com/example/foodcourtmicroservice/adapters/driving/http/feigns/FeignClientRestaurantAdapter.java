@@ -43,4 +43,9 @@ public class FeignClientRestaurantAdapter implements IRestaurantExternalServiceP
     public UserModel getUserById(String idOwner) {
         return null;
     }
+
+    @Override
+    public String getIdRestaurantFromToken(String token) {
+        return restaurantFeignClient.idRestaurantUser(token);
+    }
 }

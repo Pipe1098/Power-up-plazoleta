@@ -36,7 +36,7 @@ class OrderUseCaseTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        orderUseCase = new OrderUseCase(restaurantPersistencePort, dishPersistencePort, userFeignClientPort, orderResponseMapper, orderPersistencePort);
+        orderUseCase = new OrderUseCase(restaurantPersistencePort, dishPersistencePort, userFeignClientPort, orderResponseMapper, orderPersistencePort, twilioFeignClientPort, trazabilityFeignServicePort);
     }
 
     @Test

@@ -16,11 +16,11 @@ import static com.example.foodcourtmicroservice.configuration.Constants.RESPONSE
 
 @ControllerAdvice
 public class ControllerAdvisor {
- /*   @ExceptionHandler(NoDataFoundException.class)
+    @ExceptionHandler(NoDataFoundException.class)
     public ResponseEntity<Map<String, String>> handleNoDataFoundException(NoDataFoundException noDataFoundException) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Collections.singletonMap(RESPONSE_ERROR_MESSAGE_KEY, NO_DATA_FOUND_MESSAGE));
-    }*/
+    }
     @ExceptionHandler(DishNoFoundException.class)
     public ResponseEntity<Map<String, String>> handleUserNotFoundException(
             DishNoFoundException userNotFoundException) {
