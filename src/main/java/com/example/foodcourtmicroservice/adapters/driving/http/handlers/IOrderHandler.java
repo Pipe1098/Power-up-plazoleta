@@ -4,6 +4,7 @@ package com.example.foodcourtmicroservice.adapters.driving.http.handlers;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.request.OrderRequestDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.LogsResponseDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.OrderResponseDto;
+import com.example.foodcourtmicroservice.domain.model.EmployeeRanking;
 
 import java.util.List;
 
@@ -16,4 +17,5 @@ public interface IOrderHandler {
     void deliverOrder(Long idOrder, String pin);
     void cancelOrder(Long idOrder);
     String getLogs(Long idOrder);
+    List<EmployeeRanking> getefficiency(Long idRestaurant);
 }

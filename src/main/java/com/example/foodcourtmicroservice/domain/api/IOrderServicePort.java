@@ -1,10 +1,9 @@
 package com.example.foodcourtmicroservice.domain.api;
 
 
-import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.LogsResponseDto;
+import com.example.foodcourtmicroservice.domain.model.EmployeeRanking;
 import com.example.foodcourtmicroservice.domain.model.OrderRequestModel;
 import com.example.foodcourtmicroservice.domain.model.OrderResponseModel;
-
 import java.util.List;
 
 public interface IOrderServicePort {
@@ -22,4 +21,6 @@ public interface IOrderServicePort {
     void cancelOrder(Long idOrder);
 
     String getLogs(Long idOrder);
+
+    List<EmployeeRanking> getEmployeeRankingByRestaurant(Long idRestaurant);
 }

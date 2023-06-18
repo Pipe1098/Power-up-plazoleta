@@ -48,4 +48,9 @@ public class FeignClientRestaurantAdapter implements IRestaurantExternalServiceP
     public String getIdRestaurantFromToken(String token) {
         return restaurantFeignClient.idRestaurantUser(token);
     }
+
+    @Override
+    public String getMailFromToken(String token) {
+        return restaurantFeignClient.getmailToken(token);
+    }
 }

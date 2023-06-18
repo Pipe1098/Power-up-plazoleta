@@ -16,4 +16,6 @@ public interface IOrderPersistencePort {
     Boolean existsByIdAndState(Long idOrder, String statePending);
 
     OrderModel getOrderById(Long idOrder);
+
+    List<OrderModel> getOrdersByStateAndRestaurant(String delivered, Long idRestaurant);
 }

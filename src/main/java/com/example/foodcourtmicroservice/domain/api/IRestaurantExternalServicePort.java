@@ -8,7 +8,7 @@ public interface IRestaurantExternalServicePort {
     String getIdFromToken(String token);
     boolean existsUserById(Long idOwner);
     boolean validateOwner(String idOwner);
-    UserModel getUserById(String idOwner);
-
+    UserModel getUserById(String idUser);
     String getIdRestaurantFromToken(String token);
+    String getMailFromToken(String token);
 }

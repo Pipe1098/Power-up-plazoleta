@@ -1,6 +1,5 @@
 package com.example.foodcourtmicroservice.domain.usecase;
 
-import com.example.foodcourtmicroservice.adapters.driving.http.dto.response.LogsResponseDto;
 import com.example.foodcourtmicroservice.adapters.driving.http.mappers.IOrderResponseMapper;
 import com.example.foodcourtmicroservice.configuration.Constants;
 import com.example.foodcourtmicroservice.domain.api.IOrderServicePort;
@@ -22,6 +21,7 @@ import com.example.foodcourtmicroservice.domain.exception.OrderRestaurantMustBeE
 import com.example.foodcourtmicroservice.domain.exception.RestaurantNoFoundException;
 import com.example.foodcourtmicroservice.domain.exception.UserNotAuthenticatedException;
 import com.example.foodcourtmicroservice.domain.model.Dish;
+import com.example.foodcourtmicroservice.domain.model.EmployeeRanking;
 import com.example.foodcourtmicroservice.domain.model.LogModel;
 import com.example.foodcourtmicroservice.domain.model.OrderDishModel;
 import com.example.foodcourtmicroservice.domain.model.OrderDishRequestModel;
@@ -41,7 +41,10 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import static java.lang.Long.parseLong;
@@ -69,30 +72,31 @@ public class OrderUseCase implements IOrderServicePort {
     }
 
 
-@Override
-public void saveOrder(OrderRequestModel orderRequestModel) {
+    @Override
+    public void saveOrder(OrderRequestModel orderRequestModel) {
 
-     validateUserAuthentication();
+        validateUserAuthentication();
 
-    Long idClient = parseLong(userFeignClientPort.getIdFromToken(Token.getToken()));
+        Long idClient = parseLong(userFeignClientPort.getIdFromToken(Token.getToken()));
 
-    validateClientOrderStatus(idClient);
+        validateClientOrderStatus(idClient);
 
-    Restaurant restaurant = getRestaurantById(orderRequestModel.getResturantId());
+        Restaurant restaurant = getRestaurantById(orderRequestModel.getResturantId());
 
-    List<OrderDishRequestModel> orderDishes = orderRequestModel.getDishes();
-    validateOrderDishes(orderDishes);
+        List<OrderDishRequestModel> orderDishes = orderRequestModel.getDishes();
+        validateOrderDishes(orderDishes);
 
-    OrderModel orderModel = createOrderModel(idClient, restaurant);
-    validateDishes(orderDishes, orderModel.getRestaurant());
+        OrderModel orderModel = createOrderModel(idClient, restaurant);
+        //validateDishes(orderDishes, orderModel.getRestaurant());
 
-    OrderModel order = saveOrder(orderModel);
-    saveOrderDishes(order, orderDishes);
-    LogModel newLog=new LogModel();
-    newLog.setIdOrder(orderModel.getId());
-    newLog.setPending(LocalDateTime.now());
-    trazabilityFeignServicePort.saveLog(newLog);
-}
+        OrderModel order = saveOrder(orderModel);
+        saveOrderDishes(order, orderDishes);
+        LogModel newLog = new LogModel();
+        newLog.setIdOrder(orderModel.getId());
+        newLog.setPending(LocalDateTime.now());
+        trazabilityFeignServicePort.saveLog(newLog);
+    }
+
     @Override
     public List<OrderResponseModel> getAllOrdersWithPagination(Integer page, Integer size, String state) {
         Pageable pageable = PageRequest.of(page, size);
@@ -138,7 +142,7 @@ public void saveOrder(OrderRequestModel orderRequestModel) {
         orderModel.setState(state);
         orderModel.setIdEmployee(idEmployee);
         orderPersistencePort.saveOrder(orderModel);
-        LogModel newLog=new LogModel();
+        LogModel newLog = new LogModel();
         newLog.setIdOrder(orderModel.getId());
         newLog.setInPreparation(LocalDateTime.now());
 
@@ -181,7 +185,7 @@ public void saveOrder(OrderRequestModel orderRequestModel) {
 
         twilioFeignClientPort.sendSmsMessage(smsMessageModel);
 
-        LogModel newLog=new LogModel();
+        LogModel newLog = new LogModel();
         newLog.setIdOrder(orderModel.getId());
         newLog.setReady(LocalDateTime.now());
         trazabilityFeignServicePort.saveLog(newLog);
@@ -205,7 +209,7 @@ public void saveOrder(OrderRequestModel orderRequestModel) {
         orderModel.setState(Constants.STATE_DELIVERED);
         orderPersistencePort.saveOrder(orderModel);
 
-        LogModel newLog=new LogModel();
+        LogModel newLog = new LogModel();
         newLog.setIdOrder(orderModel.getId());
         newLog.setDelivered(LocalDateTime.now());
         trazabilityFeignServicePort.saveLog(newLog);
@@ -244,7 +248,45 @@ public void saveOrder(OrderRequestModel orderRequestModel) {
         return trazabilityFeignServicePort.timeStates(idOrder).toString();
     }
 
-    private String generatePin(UserModel userModel) {
+    public List<EmployeeRanking> getEmployeeRankingByRestaurant(Long idRestaurant) {
+        List<OrderModel> deliveredOrders = orderPersistencePort.getOrdersByStateAndRestaurant(Constants.STATE_DELIVERED, idRestaurant);
+        Map<Long, Long> employeeTotalTimes = new HashMap<>();
+        Map<Long, Integer> employeeOrderCounts = new HashMap<>();
+
+        for (OrderModel order : deliveredOrders) {
+            Long totalTime = trazabilityFeignServicePort.totalTime(order.getId());
+            Long employeeId = order.getIdEmployee();
+
+
+            if (employeeTotalTimes.containsKey(employeeId)) {
+                Long currentTotalTime = employeeTotalTimes.get(employeeId);
+                int orderCount = employeeOrderCounts.get(employeeId);
+                employeeTotalTimes.put(employeeId, currentTotalTime + totalTime);
+                employeeOrderCounts.put(employeeId, orderCount + 1);
+            } else {
+                employeeTotalTimes.put(employeeId, totalTime);
+                employeeOrderCounts.put(employeeId, 1);
+            }
+        }
+
+        List<EmployeeRanking> employeeRankingList = new ArrayList<>();
+
+        for (Map.Entry<Long, Long> entry : employeeTotalTimes.entrySet()) {
+            Long employeeId = entry.getKey();
+            Long totalTime = entry.getValue();
+            String employeeMail = userFeignClientPort.getMailFromToken(Token.getToken());
+            int orderCount = employeeOrderCounts.get(employeeId);
+            long averageTime = totalTime / orderCount; // Cálculo del promedio
+            EmployeeRanking employeeRanking = new EmployeeRanking(employeeId, averageTime, employeeMail);
+            employeeRankingList.add(employeeRanking);
+        }
+
+        employeeRankingList.sort(Comparator.comparingLong(EmployeeRanking::getAverageTime));
+
+        return employeeRankingList;
+    }
+
+    public String generatePin(UserModel userModel) {
 
         String alphanumericCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         int pinLength = 6; // Longitud del PIN deseada
@@ -264,7 +306,8 @@ public void saveOrder(OrderRequestModel orderRequestModel) {
 
         return pin;
     }
-    private void validateUserAuthentication() {
+
+    public void validateUserAuthentication() {
         if (Token.getToken() == null) {
             throw new UserNotAuthenticatedException(Constants.USER_NOT_AUTHENTICATED);
         }
@@ -272,14 +315,14 @@ public void saveOrder(OrderRequestModel orderRequestModel) {
 
     private void validateClientOrderStatus(Long idClient) {
         List<String> states = List.of(Constants.STATE_PENDING, Constants.STATE_IN_PREPARATION, Constants.STATE_READY);
-        if (orderPersistencePort.existsByIdClientAndState(idClient, states.get(0))||
+        if (orderPersistencePort.existsByIdClientAndState(idClient, states.get(0)) ||
                 orderPersistencePort.existsByIdClientAndState(idClient, states.get(1)) ||
                 orderPersistencePort.existsByIdClientAndState(idClient, states.get(2))) {
             throw new ClientHasAnOrderException(Constants.CLIENT_HAS_AN_ORDER);
         }
     }
 
-    private Restaurant getRestaurantById(Long restaurantId) {
+    public Restaurant getRestaurantById(Long restaurantId) {
         Restaurant restaurant = restaurantPersistencePort.getRestaurant(restaurantId);
         if (restaurant == null) {
             throw new RestaurantNoFoundException(Constants.RESTAURANT_NOT_FOUND);
@@ -297,7 +340,7 @@ public void saveOrder(OrderRequestModel orderRequestModel) {
         return new OrderModel(-1L, idClient, LocalDate.now(), Constants.STATE_PENDING, null, restaurant);
     }
 
-    private void validateDishes(List<OrderDishRequestModel> orderDishes, Restaurant restaurant) {
+    public void validateDishes(List<OrderDishRequestModel> orderDishes, Restaurant restaurant) {
         for (OrderDishRequestModel dishRequestModel : orderDishes) {
             Dish dish = dishPersistencePort.getDish(dishRequestModel.getIdDish());
             if (dish == null) {

@@ -10,4 +10,5 @@ import java.util.List;
 public interface TrazabilityFeignServicePort {
     void saveLog(LogModel log);
     List<LogsResponseDto> timeStates(Long idOrder);
+    Long totalTime(Long id);
 }

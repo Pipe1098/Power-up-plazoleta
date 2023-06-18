@@ -8,6 +8,7 @@ import com.example.foodcourtmicroservice.adapters.driving.http.handlers.IOrderHa
 import com.example.foodcourtmicroservice.adapters.driving.http.mappers.IOrderRequestMapper;
 import com.example.foodcourtmicroservice.adapters.driving.http.mappers.IOrderResponseMapper;
 import com.example.foodcourtmicroservice.domain.api.IOrderServicePort;
+import com.example.foodcourtmicroservice.domain.model.EmployeeRanking;
 import com.example.foodcourtmicroservice.domain.model.OrderRequestModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -61,6 +62,11 @@ public class OrderHandlerImpl implements IOrderHandler {
     @Override
     public String getLogs(Long idOrder) {
         return  orderServicePort.getLogs(idOrder);
+    }
+
+    @Override
+    public List<EmployeeRanking> getefficiency(Long idRestaurant) {
+        return orderServicePort.getEmployeeRankingByRestaurant(idRestaurant);
     }
 
 }

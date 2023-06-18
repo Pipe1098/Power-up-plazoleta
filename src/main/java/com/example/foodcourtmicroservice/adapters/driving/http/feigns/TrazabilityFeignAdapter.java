@@ -24,4 +24,9 @@ public class TrazabilityFeignAdapter implements TrazabilityFeignServicePort {
         return trazabilityFeignClient.getLogOrder(idOrder);
     }
 
+    @Override
+    public Long totalTime(Long id) {
+        return trazabilityFeignClient.getTimeOrder(id);
+    }
+
 }

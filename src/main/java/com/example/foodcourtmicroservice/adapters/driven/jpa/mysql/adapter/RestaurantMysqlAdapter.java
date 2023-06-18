@@ -13,8 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +25,7 @@ public class RestaurantMysqlAdapter implements IRestaurantPersistencePort {
 
     @Override
     public void saveRestaurant(Restaurant restaurant) {
-        if(restaurantRepository.findRestaurantEntityByNit(restaurant.getNit()).isPresent()){
+        if(restaurantRepository.findByNit(restaurant.getNit()).isPresent()){
             throw new NitAlredyRegistredException(Constants.NIT_ALREADY_REGISTERED);
         }
         RestaurantEntity restaurantEntity = restaurantEntityMapper.toEntity(restaurant);

@@ -2,9 +2,12 @@ package com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.adapter;
 
 
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.DishEntity;
+import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.OrderEntity;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.entity.RestaurantEntity;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.IDishEntityMapper;
+import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.mappers.IOrderEntityMapper;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.repositories.IDishRepository;
+import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.repositories.IOrderRepository;
 import com.example.foodcourtmicroservice.adapters.driven.jpa.mysql.repositories.IRestaurantRepository;
 import com.example.foodcourtmicroservice.configuration.Constants;
 import com.example.foodcourtmicroservice.domain.exception.CategoryNotFoundException;
@@ -16,6 +19,7 @@ import com.example.foodcourtmicroservice.domain.model.Restaurant;
 import com.example.foodcourtmicroservice.domain.spi.IDishPersistencePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,7 +33,9 @@ import java.util.stream.Collectors;
 public class DishMysqlAdapter implements IDishPersistencePort {
     private final IDishRepository dishRepository;
     private final IDishEntityMapper dishEntityMapper;
+    private final IOrderEntityMapper orderEntityMapper;
     private final IRestaurantRepository restaurantRepository;
+    private final IOrderRepository orderRepository;
 
     @Override
     public void saveDish(Dish dish) {
@@ -86,12 +92,23 @@ public class DishMysqlAdapter implements IDishPersistencePort {
 
     @Override
     public Page<OrderModel> findByState(String state, Pageable pageable) {
-        return null;
+        Page<OrderEntity> orderPage = orderRepository.findByState(state, pageable);
+        List<OrderModel> orderModels = orderPage.stream()
+                .map(orderEntityMapper::toOrderModel)
+                .collect(Collectors.toList());
+         return new PageImpl<>(orderModels, pageable, orderPage.getTotalElements());
     }
 
     @Override
     public Page<OrderModel> findAll(Pageable pageable) {
-        return null;
+        Page<OrderEntity> orderPage = orderRepository.findAll(pageable);
+
+        List<OrderModel> orderModels = orderPage.stream()
+                .map(orderEntityMapper::toOrderModel)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(orderModels, pageable, orderPage.getTotalElements());
+
     }
 
 }
