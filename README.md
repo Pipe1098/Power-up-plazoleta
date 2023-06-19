@@ -367,3 +367,7 @@ Example of a successful response:
   }
 ]
 ```
+## Diagrams
+### Arquitecture:
+![ARQUITECTURA V3-CONTENEDORES drawio](https://github.com/Pipe1098/Power-up-plazoleta/assets/90018701/b4254acf-e365-4ac8-a80f-bfd337e3dfcd)
+
