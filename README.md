@@ -4,7 +4,7 @@ Food court microservice
 <div align="center">
 <h3 align="center">🔌🏢 PRAGMA POWER-UP 🍽️</h3>
   <p align="center">
-In this challenge, you are tasked with designing the backend of a system that centralizes the services and orders of a restaurant chain with multiple branches across the city. This microservice is responsible for implementing the business logic related to the food court, ensuring seamless operations and delightful dining experiences. 🍔🌯🍕
+🍔In this challenge, you are tasked with designing the backend of a system that centralizes the services and orders of a restaurant chain with multiple branches across the city. This microservice is responsible for implementing the business logic related to the food court, ensuring seamless operations and delightful dining experiences. 🌯🍕This microservice communicates with the user, messaging, and traceability microservice. For this, it is necessary to execute or launch said microservices for proper operation.
 
 Get ready to power up the food court and create a robust backend solution that optimizes processes, manages orders, and enhances the overall efficiency of the restaurant chain. Let's embark on this exciting journey! 💪🚀
   </p>
