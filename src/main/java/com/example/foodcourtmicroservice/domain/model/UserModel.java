@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -19,6 +21,7 @@ public class UserModel {
     private String email;
     private String password;
     private RoleModel role;
+
 
     public void setPin(String pin) {
         Token.setPin(pin);

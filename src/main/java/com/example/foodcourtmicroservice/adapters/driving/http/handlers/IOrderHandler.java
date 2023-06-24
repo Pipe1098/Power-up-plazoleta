@@ -17,5 +17,5 @@ public interface IOrderHandler {
     void deliverOrder(Long idOrder, String pin);
     void cancelOrder(Long idOrder);
     String getLogs(Long idOrder);
-    List<EmployeeRanking> getefficiency(Long idRestaurant);
+    List<EmployeeRanking> getEfficiency(Long idRestaurant);
 }

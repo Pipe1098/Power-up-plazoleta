@@ -65,7 +65,7 @@ public class OrderHandlerImpl implements IOrderHandler {
     }
 
     @Override
-    public List<EmployeeRanking> getefficiency(Long idRestaurant) {
+    public List<EmployeeRanking> getEfficiency(Long idRestaurant) {
         return orderServicePort.getEmployeeRankingByRestaurant(idRestaurant);
     }
 

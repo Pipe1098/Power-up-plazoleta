@@ -87,7 +87,7 @@ public class OrderUseCase implements IOrderServicePort {
         validateOrderDishes(orderDishes);
 
         OrderModel orderModel = createOrderModel(idClient, restaurant);
-        //validateDishes(orderDishes, orderModel.getRestaurant());
+        validateDishes(orderDishes, orderModel.getRestaurant());
 
         OrderModel order = saveOrder(orderModel);
         saveOrderDishes(order, orderDishes);
@@ -172,10 +172,10 @@ public class OrderUseCase implements IOrderServicePort {
 
         orderModel.setState(Constants.STATE_READY);
         orderPersistencePort.saveOrder(orderModel);
-
-        UserModel userModel = userFeignClientPort.getUserById(orderModel.getIdClient().toString());
-        String ClientName = userModel.getName();
-        String pin = generatePin(userModel);
+        String idClient = userFeignClientPort.getIdFromToken(Token.getToken());
+        String name = userFeignClientPort.getUserNameById(idClient);
+        String ClientName = name;
+        String pin = generatePin(orderModel);
 
 
         String message = "Good day, Mr./Ms. " + ClientName + ", your order is now ready for pickup.\nRemember to show the following PIN " + pin + " to receive your order.";
@@ -286,7 +286,7 @@ public class OrderUseCase implements IOrderServicePort {
         return employeeRankingList;
     }
 
-    public String generatePin(UserModel userModel) {
+    public String generatePin(OrderModel orderModel) {
 
         String alphanumericCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         int pinLength = 6; // Longitud del PIN deseada
@@ -302,7 +302,7 @@ public class OrderUseCase implements IOrderServicePort {
         }
 
         String pin = pinBuilder.toString();
-        userModel.setPin(pin);
+        orderModel.setPin(pin);
 
         return pin;
     }

@@ -32,7 +32,7 @@ public class DishRestController {
             responses = {
                     @ApiResponse(responseCode = "201", description = "Dish registred!",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Map"))),
-                    @ApiResponse(responseCode = "400", description = "Mala solicitud de registro, por favor verifique los datos",
+                    @ApiResponse(responseCode = "400", description = "Bad request, please verify data",
                             content = @Content(mediaType = "application/json", schema = @Schema(ref = "#/components/schemas/Error")))
             })
     @PostMapping("")

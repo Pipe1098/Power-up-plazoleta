@@ -11,4 +11,5 @@ public interface IRestaurantExternalServicePort {
     UserModel getUserById(String idUser);
     String getIdRestaurantFromToken(String token);
     String getMailFromToken(String token);
+    String getUserNameById(String idUser);
 }

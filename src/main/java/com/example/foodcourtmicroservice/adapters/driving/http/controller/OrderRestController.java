@@ -143,6 +143,6 @@ public class OrderRestController {
     })
     @GetMapping("/efficiency/{idRestaurant}")
     public List<EmployeeRanking> getEfficiency(@PathVariable("idRestaurant") Long idRestaurant){
-        return orderHandler.getefficiency(idRestaurant);
+        return orderHandler.getEfficiency(idRestaurant);
     }
 }

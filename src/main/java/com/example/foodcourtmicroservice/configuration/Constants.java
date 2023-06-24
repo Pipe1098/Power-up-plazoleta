@@ -17,7 +17,7 @@ public class Constants {
     public static final String ROLE_CLIENT = "CLIENT_ROLE";
     public static final String NIT_ALREADY_REGISTERED = "The NIT of this restaurant is already registered.";
     public static final String PROVIDER_DESCRIPTION = "PROVIDER_ROLE";
-    public static final String ROLE_ADMIN = "ADMIN_ROLE";
+    public static final String ROLE_ADMIN = "ADMINISTRATOR_ROLE";
     public static final String CATEGORY_NOT_FOUND = "The category is not registered.";
     public static final String DISH_NOT_FOUND = "There isn't is dishes not available in this moment.";
     public static final String ACTUAL_STATE_NOT_VALID = "Actual state invalid to make the change.";
@@ -26,7 +26,7 @@ public class Constants {
     public static final String ORDER_NOT_EXIST= "The order doesn't exist";
     public static final String DISH_NOT_ACTIVE= "The dish isn't active";
     public static final String DISH_IDRESTAURANT_DIFERENT= "The dish idrestaurant is diferent that the order idrestaurant";
-    public static final String IDEMPLOYEE_IDORDER_DIFERENT= "The Employee is diferent that the order employee";
+    public static final String IDEMPLOYEE_IDORDER_DIFERENT= "The employee Restaurant id is diferent that the order restaurant id";
     public static final String NOT_DATA_FOUND_DISH = "No dishes found in this order.";
     public static final String RESPONSE_ERROR_MESSAGE_KEY = "error";
     public static final String NO_DATA_FOUND_MESSAGE = "No data found for the requested petition";

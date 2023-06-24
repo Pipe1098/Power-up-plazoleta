@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "user-microservice", url = "${external.usermicroservice.base-url}",configuration = FeignClientConfig.class)
 public interface RestaurantFeignClient {
 
-    @GetMapping(value = "/user/validate-owner/{dniNumber}")
-    Boolean validateOwner(@PathVariable("dniNumber") String dniNumber);
+    @GetMapping(value = "/api/v1/user/validate-owner/{dni}")
+    Boolean validateOwner(@PathVariable("dniNumber") String dni);
 
     @PostMapping(value = "/auth/login")
     ResponseEntity<JwtResponseDto> login(@RequestBody AuthRequestDto authRequestDto);
 
-    @GetMapping(value = "/auth/id/{token}")
+    @GetMapping(value = "/auth/dni/{token}")
     String idUser(@PathVariable("token") String token);
 
     @GetMapping(value = "/auth/role/{token}")
@@ -35,4 +35,6 @@ public interface RestaurantFeignClient {
     @GetMapping(value = "/auth/mail/{token}")
     String getmailToken (@PathVariable("token") String token);
 
+    @GetMapping(value = "/api/v1/user/name/{dni}")
+    String getUserNameById(String idUser);
 }
